@@ -31,4 +31,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 # ── Quick start (no venv) ──────────────────────────────────────────────────
 # ANTHROPIC_API_KEY=sk-ant-xxx uvicorn main:app --reload --port 8000
-
+#!/bin/bash
+# DataBro for Render
+echo "=== Starting DataBro on Render ==="
+exec uvicorn main:app --host 0.0.0.0 --port $PORT
