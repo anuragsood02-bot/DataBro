@@ -290,36 +290,90 @@ async def get_agent_config(agent_id: str, user=Depends(get_current_user)):
 
 
 # ── Custom agent builder ──────────────────────────────────────────────────────
+# NOTE: Pre-built agents (sales, finance, inventory) live in DEFAULT_PROMPTS above
+# and are NEVER touched here. These routes only create/edit user-owned custom agents.
 
-@app.post("/agents/custom", tags=["Custom Agents"])
-async def create_custom_agent(req: CustomAgentCreate, user=Depends(get_current_user)):
-    """Create a new custom agent from the builder wizard."""
-    agent_id = "custom_" + str(uuid.uuid4())[:8]
-    prompt = generate_agent_prompt(
+def _build_prompt_from_req(req: CustomAgentCreate) -> str:
+    """Helper — calls generate_agent_prompt with all wizard fields."""
+    return generate_agent_prompt(
         name=req.name, description=req.description,
         actions=req.actions, params=req.params,
         outputs=req.outputs, infographic_styles=req.infographic_style,
         extra_instructions=req.extra_instructions,
+        file_descriptions=req.file_descriptions,
+        column_metadata=req.column_metadata,
+        business_rules=req.business_rules,
+        sops=req.sops,
+        understanding_notes=req.understanding_notes,
+        action_parameters=req.action_parameters,
+        action_business_rules=req.action_business_rules,
+        action_extra=req.action_extra,
+        infographic_notes=req.infographic_notes,
     )
+
+
+@app.post("/agents/custom", tags=["Custom Agents"])
+async def create_custom_agent(req: CustomAgentCreate, user=Depends(get_current_user)):
+    """
+    Create a new custom agent from the 5-step builder wizard.
+    Stores all wizard fields and auto-generates a rich Claude system prompt.
+    Pre-built agents (sales, finance, inventory) are NEVER modified here.
+    """
+    agent_id = "custom_" + str(uuid.uuid4())[:8]
+    prompt = _build_prompt_from_req(req)
     agent = {
-        "id": agent_id, "name": req.name, "description": req.description,
-        "icon": req.icon, "color": req.color, "sources": req.sources,
-        "clean": req.clean, "actions": req.actions, "outputs": req.outputs,
-        "share_destinations": req.share_destinations,
+        "id": agent_id,
+        "name": req.name, "description": req.description,
+        "icon": req.icon, "color": req.color,
+        # Step 2 — data sources
+        "sources": req.sources,
+        "file_descriptions": req.file_descriptions,
+        "clean": req.clean,
+        "column_metadata": req.column_metadata,
+        "understanding_notes": req.understanding_notes,
+        # Step 3 — rules & SOPs
+        "business_rules": req.business_rules,
+        "sops": req.sops,
+        # Step 4 — actions
+        "actions": req.actions,
+        "action_parameters": req.action_parameters,
+        "action_business_rules": req.action_business_rules,
+        "action_extra": req.action_extra,
+        # Step 5 — output & infographics
+        "outputs": req.outputs,
         "infographic_style": req.infographic_style,
-        "extra_instructions": req.extra_instructions, "params": req.params,
+        "infographic_notes": req.infographic_notes,
+        "share_destinations": req.share_destinations,
+        "extra_instructions": req.extra_instructions,
+        # Meta
         "system_prompt": prompt, "is_custom": True,
         "created_at": datetime.utcnow().isoformat(),
         "user_id": user["user_id"],
     }
     CUSTOM_AGENTS.setdefault(user["user_id"], []).append(agent)
-    # Also save as agent config
     AGENT_CONFIGS[f"{user['user_id']}_{agent_id}"] = {
         "agent_id": agent_id, "name": req.name, "icon": req.icon,
         "system_prompt": prompt, "extra_instructions": req.extra_instructions,
         "dataset_ids": [], "is_custom": True,
     }
     return agent
+
+
+@app.put("/agents/custom/{agent_id}", tags=["Custom Agents"])
+async def update_custom_agent(agent_id: str, req: CustomAgentCreate, user=Depends(get_current_user)):
+    """Update an existing custom agent. Only the owner can update their own custom agents."""
+    agents = CUSTOM_AGENTS.get(user["user_id"], [])
+    idx = next((i for i, a in enumerate(agents) if a["id"] == agent_id), None)
+    if idx is None:
+        raise HTTPException(404, "Custom agent not found or you do not own it")
+    prompt = _build_prompt_from_req(req)
+    updated = {**agents[idx], **req.model_dump(), "id": agent_id,
+               "system_prompt": prompt, "updated_at": datetime.utcnow().isoformat()}
+    CUSTOM_AGENTS[user["user_id"]][idx] = updated
+    key = f"{user['user_id']}_{agent_id}"
+    if key in AGENT_CONFIGS:
+        AGENT_CONFIGS[key]["system_prompt"] = prompt
+    return updated
 
 
 @app.get("/agents/custom", tags=["Custom Agents"])
@@ -330,9 +384,17 @@ async def list_custom_agents(user=Depends(get_current_user)):
 @app.delete("/agents/custom/{agent_id}", tags=["Custom Agents"])
 async def delete_custom_agent(agent_id: str, user=Depends(get_current_user)):
     agents = CUSTOM_AGENTS.get(user["user_id"], [])
+    if not any(a["id"] == agent_id for a in agents):
+        raise HTTPException(404, "Custom agent not found or you do not own it")
     CUSTOM_AGENTS[user["user_id"]] = [a for a in agents if a["id"] != agent_id]
     AGENT_CONFIGS.pop(f"{user['user_id']}_{agent_id}", None)
     return {"success": True}
+
+
+@app.post("/agents/generate-prompt", tags=["Custom Agents"])
+async def generate_prompt_preview(req: CustomAgentCreate, user=Depends(get_current_user)):
+    """Preview the auto-generated system prompt before saving. Useful for the wizard preview step."""
+    return {"prompt": _build_prompt_from_req(req)}
 
 
 # ── Chat ──────────────────────────────────────────────────────────────────────
@@ -397,20 +459,6 @@ async def run_agent(req: AnalysisRequest, user=Depends(get_current_user)):
         "datasets": [d["name"] for d in selected],
         **result,
     }
-
-
-# ── Agent prompt generator ────────────────────────────────────────────────────
-
-@app.post("/agents/generate-prompt", tags=["Custom Agents"])
-async def generate_prompt(req: CustomAgentCreate, user=Depends(get_current_user)):
-    """Preview the auto-generated system prompt before creating an agent."""
-    prompt = generate_agent_prompt(
-        name=req.name, description=req.description,
-        actions=req.actions, params=req.params,
-        outputs=req.outputs, infographic_styles=req.infographic_style,
-        extra_instructions=req.extra_instructions,
-    )
-    return {"prompt": prompt}
 
 
 # ── Health ────────────────────────────────────────────────────────────────────
