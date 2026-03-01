@@ -747,7 +747,11 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
 // ── STATE ──────────────────────────────────────────────
 // ── Backend URL ───────────────────────────────────────────────────────────────
 // Change this to your Render URL after deploying: https://databro-api.onrender.com
-const BACKEND_URL = 'https://databro-1.onrender.com';
+// When hosted on Render, the frontend and backend share the same domain.
+// So we use window.location.origin — works both locally and on Render automatically.
+const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000'
+  : window.location.origin;
 
 const S = {
   user: null,
