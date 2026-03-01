@@ -1,16 +1,15 @@
-# FastAPI + core
+# DataBro Production Requirements (Python 3.14.3 ✅)
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 python-multipart==0.0.9
 
-# Data processing (PRE-COMPILED wheels)
-pandas==2.1.4
+# ✅ Python 3.14.3 Compatible Pandas
+pandas==2.3.3
 openpyxl==3.1.5
 
-# Auth (optional, remove if unused)
+# Full features
+anthropic==0.28.0
+aiofiles==23.2.1
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-aiofiles==23.2.1
-
-# AI (optional for demo - disable temporarily)
-# anthropic==0.28.0
+pydantic==2.7.4
