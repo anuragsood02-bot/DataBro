@@ -391,6 +391,109 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
   .ws-side{width:100%;height:auto}
   .customiser-panel{width:100%}
 }
+
+/* ════════════════ BUILDER MODAL ════════════════ */
+.bld-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.bld-overlay.open{display:flex}
+.bld-modal{background:var(--ink2);border:1px solid var(--border2);border-radius:24px;width:min(720px,96vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7)}
+.bld-hdr{padding:22px 28px 0;flex-shrink:0}
+.bld-hdr-row{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.bld-title{font-family:'Cabinet Grotesk',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;flex:1}
+.bld-close{background:var(--ink3);border:1px solid var(--border);color:var(--mist);border-radius:8px;padding:6px 11px;font-size:.8rem;cursor:pointer}
+.bld-close:hover{color:#fff;border-color:var(--border2)}
+/* stepper */
+.bld-stepper{display:flex;align-items:center;gap:0;margin-bottom:20px}
+.bld-step{display:flex;align-items:center;gap:6px;flex:1}
+.bld-step-dot{width:26px;height:26px;border-radius:50%;background:var(--ink3);border:2px solid var(--border);color:var(--fog);font-size:.66rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;font-family:'JetBrains Mono',monospace}
+.bld-step.active .bld-step-dot{background:var(--volt);border-color:var(--volt);color:var(--ink)}
+.bld-step.done .bld-step-dot{background:var(--emerald);border-color:var(--emerald);color:var(--ink)}
+.bld-step-lbl{font-size:.6rem;font-weight:600;color:var(--fog);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.bld-step.active .bld-step-lbl{color:var(--volt)}
+.bld-step.done .bld-step-lbl{color:var(--emerald)}
+.bld-step-line{flex:1;height:1px;background:var(--border);margin:0 6px}
+/* body */
+.bld-body{flex:1;overflow-y:auto;padding:0 28px}
+.bld-section{display:none}
+.bld-section.active{display:block}
+.bld-sh{font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:4px}
+.bld-ss{font-size:.76rem;color:var(--mist);margin-bottom:18px;line-height:1.5}
+/* chips */
+.chip-group{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.chip{padding:7px 13px;border-radius:20px;background:var(--ink3);border:1px solid var(--border);color:var(--mist);font-size:.74rem;font-weight:600;cursor:pointer;transition:.15s;user-select:none}
+.chip:hover{border-color:var(--border2);color:#fff}
+.chip.selected{background:rgba(184,255,87,.12);border-color:var(--volt);color:var(--volt)}
+/* action cards */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.action-card{background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:13px 14px;cursor:pointer;transition:.15s}
+.action-card:hover{border-color:var(--border2)}
+.action-card.selected{background:rgba(184,255,87,.07);border-color:var(--volt)}
+.ac-card-icon{font-size:1.2rem;margin-bottom:5px}
+.ac-card-name{font-size:.78rem;font-weight:700;color:#fff;margin-bottom:2px}
+.ac-card-desc{font-size:.68rem;color:var(--mist);line-height:1.4}
+/* output cards */
+.out-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.out-card{background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:.15s;text-align:center}
+.out-card:hover{border-color:var(--border2)}
+.out-card.selected{background:rgba(56,189,248,.07);border-color:var(--azure)}
+.out-card-icon{font-size:1.3rem;margin-bottom:4px}
+.out-card-name{font-size:.73rem;font-weight:700;color:#fff}
+/* file rows */
+.file-row{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.file-row .fi{flex:1;margin:0}
+.file-row-remove{background:var(--ink3);border:1px solid var(--border);color:var(--mist);border-radius:8px;padding:6px 10px;font-size:.8rem;cursor:pointer;flex-shrink:0}
+.file-row-remove:hover{color:var(--rose);border-color:var(--rose)}
+.add-row-btn{background:transparent;border:1px dashed var(--border2);color:var(--mist);border-radius:10px;padding:8px;width:100%;font-size:.75rem;cursor:pointer;margin-bottom:14px}
+.add-row-btn:hover{border-color:var(--volt);color:var(--volt)}
+/* rule rows */
+.rule-row{display:flex;gap:8px;margin-bottom:7px}
+.rule-row textarea{flex:1;background:var(--ink3);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.78rem;color:#fff;resize:none;font-family:inherit;line-height:1.5}
+.rule-row textarea:focus{border-color:var(--volt)}
+/* preview */
+.bld-preview{background:var(--ink3);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+.bld-preview-name{font-family:'Cabinet Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:4px}
+.bld-preview-desc{font-size:.76rem;color:var(--mist);margin-bottom:10px}
+.bld-preview-tags{display:flex;flex-wrap:wrap;gap:5px}
+.bld-preview-tag{padding:3px 8px;border-radius:6px;font-size:.66rem;font-weight:600;background:rgba(184,255,87,.1);color:var(--volt);border:1px solid rgba(184,255,87,.2)}
+/* footer */
+.bld-ftr{padding:16px 28px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.bld-step-counter{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--fog);flex:1}
+
+/* ════════════════ TEMPLATE LIBRARY ════════════════ */
+.tlib-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:none;backdrop-filter:blur(4px)}
+.tlib-overlay.open{display:flex}
+.tlib-panel{position:fixed;right:0;top:0;bottom:0;width:min(560px,96vw);background:var(--ink2);border-left:1px solid var(--border2);display:flex;flex-direction:column;animation:slideIn .25s ease}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.tlib-hdr{padding:20px 22px;border-bottom:1px solid var(--border);flex-shrink:0}
+.tlib-hdr-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tlib-title{font-family:'Cabinet Grotesk',sans-serif;font-size:1.1rem;font-weight:800;color:#fff;flex:1}
+.tlib-search{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:.82rem;color:#fff}
+.tlib-cats{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tlib-cat{padding:5px 11px;border-radius:16px;background:var(--ink3);border:1px solid var(--border);color:var(--mist);font-size:.7rem;font-weight:600;cursor:pointer;transition:.15s}
+.tlib-cat.active{background:rgba(184,255,87,.12);border-color:var(--volt);color:var(--volt)}
+.tlib-body{flex:1;overflow-y:auto;padding:16px 22px}
+.tlib-group-title{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--fog);text-transform:uppercase;letter-spacing:.7px;margin:14px 0 8px}
+.tlib-card{background:var(--ink3);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:9px;cursor:pointer;transition:.15s}
+.tlib-card:hover{border-color:var(--volt);transform:translateX(-3px)}
+.tlib-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.tlib-card-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.tlib-card-name{font-weight:700;color:#fff;font-size:.85rem}
+.tlib-card-role{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--fog)}
+.tlib-card-desc{font-size:.73rem;color:var(--mist);line-height:1.5;margin-bottom:8px}
+.tlib-card-tags{display:flex;flex-wrap:wrap;gap:4px}
+.tlib-tag{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:600;background:var(--ink2);color:var(--mist);border:1px solid var(--border)}
+.tlib-use-btn{margin-top:9px;background:rgba(184,255,87,.1);border:1px solid rgba(184,255,87,.25);color:var(--volt);border-radius:8px;padding:7px 14px;font-size:.74rem;font-weight:700;width:100%;cursor:pointer;transition:.15s}
+.tlib-use-btn:hover{background:rgba(184,255,87,.2)}
+
+/* ════════════════ MY AGENTS SECTION ════════════════ */
+.my-agents-empty{background:var(--ink3);border:1px dashed var(--border2);border-radius:16px;padding:32px;text-align:center;margin-bottom:28px}
+.my-agents-empty-icon{font-size:2.2rem;margin-bottom:8px}
+.my-agents-empty-t{font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:4px}
+.my-agents-empty-s{font-size:.75rem;color:var(--mist);margin-bottom:16px}
+.my-agent-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;transition:.2s;position:relative;overflow:hidden}
+.my-agent-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--mac,var(--volt));border-radius:2px 2px 0 0}
+.my-agent-card:hover{border-color:var(--border2);box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.mac-actions{display:flex;gap:6px;margin-top:12px}
+
 </style>
 </head>
 <body>
@@ -486,8 +589,36 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
       <div class="user-pill" onclick="logout()"><div class="uav" id="dash-uav">D</div><span class="uname" id="dash-uname">demo@databro.ai</span></div>
     </header>
     <div class="dash-body">
-      <div class="dash-wt"><div class="dash-wt-h">Good to see you, <span id="dash-greet" style="color:var(--volt)">there</span> 👋</div><div class="dash-wt-s">Choose an agent and start analysing — or customise any agent to match your workflow.</div></div>
-      <div class="section-hrow"><div class="sec-title">Your Agents</div><div class="badge-count">3 AVAILABLE</div></div>
+      <div class="dash-wt">
+        <div class="dash-wt-h">Good to see you, <span id="dash-greet" style="color:var(--volt)">there</span> 👋</div>
+        <div class="dash-wt-s">Build your own AI agents or launch a pre-built one — no data team needed.</div>
+      </div>
+
+      <!-- MY AGENTS -->
+      <div class="section-hrow">
+        <div class="sec-title">My Agents</div>
+        <span id="my-agent-count" class="badge-count">0 BUILT</span>
+        <div style="flex:1"></div>
+        <button class="btn btn-ink btn-sm" onclick="openTlib()" style="margin-right:7px">📚 Templates</button>
+        <button class="btn btn-volt btn-sm" onclick="openBuilder()">✦ Build Agent</button>
+      </div>
+      <div id="my-agents-grid" class="agents-grid">
+        <div class="my-agents-empty" style="grid-column:1/-1">
+          <div class="my-agents-empty-icon">✦</div>
+          <div class="my-agents-empty-t">No custom agents yet</div>
+          <div class="my-agents-empty-s">Build your first agent from scratch or start from a template — takes under 2 minutes.</div>
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button class="btn btn-volt btn-sm" onclick="openBuilder()">✦ Build Agent</button>
+            <button class="btn btn-ink btn-sm" onclick="openTlib()">📚 Browse Templates</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRE-BUILT AGENTS -->
+      <div class="section-hrow" style="margin-top:8px">
+        <div class="sec-title">Pre-built Agents</div>
+        <span class="badge-count" style="background:rgba(136,136,170,.1);border-color:rgba(136,136,170,.2);color:var(--mist)">READ-ONLY</span>
+      </div>
       <div class="agents-grid">
         <div class="agent-card" style="--ac:#fbbf24" onclick="openAgent('sales')">
           <div class="ac-top"><div class="ac-iw" style="background:rgba(251,191,36,.1)">📊</div><div><div class="ac-name">Sales Planner</div><div class="ac-role">SALES_TERRITORY_AGENT</div></div></div>
@@ -506,15 +637,6 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
           <div class="ac-desc">Upload inventory datasets. Auto-schema, common identifier matching, relationship mapping, full audit reports.</div>
           <div class="ac-src"><span class="src-tag">📋 Stock</span><span class="src-tag">🔗 Multi-DB</span><span class="src-tag">📊 Audit</span></div>
           <button class="ac-btn" style="background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.2)">Open Inventory Auditor →</button>
-        </div>
-      </div>
-      <div style="background:var(--ink2);border:1px solid var(--border);border-radius:16px;padding:18px">
-        <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:.9rem;font-weight:700;color:#fff;margin-bottom:12px">⚙️ How Agent Customisation Works</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
-          <div style="background:var(--ink3);border-radius:9px;padding:12px;font-size:.74rem;color:var(--mist)"><strong style="color:#fff;display:block;margin-bottom:4px">1. Open any agent</strong>Click the agent card above to enter the workspace.</div>
-          <div style="background:var(--ink3);border-radius:9px;padding:12px;font-size:.74rem;color:var(--mist)"><strong style="color:#fff;display:block;margin-bottom:4px">2. Upload your files</strong>Drag CSV/Excel/JSON files into the left panel.</div>
-          <div style="background:var(--ink3);border-radius:9px;padding:12px;font-size:.74rem;color:var(--mist)"><strong style="color:#fff;display:block;margin-bottom:4px">3. Click ⚙️ Customise</strong>Edit the AI's system prompt, add instructions, select which files it uses.</div>
-          <div style="background:var(--ink3);border-radius:9px;padding:12px;font-size:.74rem;color:var(--mist)"><strong style="color:#fff;display:block;margin-bottom:4px">4. Save &amp; run</strong>Agent remembers your config. Generate output or chat in real time.</div>
         </div>
       </div>
     </div>
@@ -1833,6 +1955,769 @@ function toast(msg){
   const t=document.createElement('div'); t.className='toast'; t.innerHTML=msg;
   document.body.appendChild(t); setTimeout(()=>t.remove(),3500);
 }
+
+
+// ══════════════════════════════════════════════════════════
+// MY AGENTS — persistent in S.myAgents
+// ══════════════════════════════════════════════════════════
+S.myAgents = JSON.parse(localStorage.getItem('databro_my_agents') || '[]');
+
+function saveMyAgents() {
+  localStorage.setItem('databro_my_agents', JSON.stringify(S.myAgents));
+}
+
+function renderMyAgents() {
+  const grid = document.getElementById('my-agents-grid');
+  const count = document.getElementById('my-agent-count');
+  if (!grid) return;
+  if (!S.myAgents.length) {
+    grid.innerHTML = `<div class="my-agents-empty" style="grid-column:1/-1">
+      <div class="my-agents-empty-icon">✦</div>
+      <div class="my-agents-empty-t">No custom agents yet</div>
+      <div class="my-agents-empty-s">Build your first agent from scratch or start from a template — takes under 2 minutes.</div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-volt btn-sm" onclick="openBuilder()">✦ Build Agent</button>
+        <button class="btn btn-ink btn-sm" onclick="openTlib()">📚 Browse Templates</button>
+      </div>
+    </div>`;
+  } else {
+    grid.innerHTML = S.myAgents.map(a => `
+      <div class="my-agent-card" style="--mac:${a.color}">
+        <div class="ac-top">
+          <div class="ac-iw" style="background:${a.color}22;width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0">${a.icon}</div>
+          <div><div class="ac-name">${a.name}</div><div class="ac-role">CUSTOM_AGENT</div></div>
+        </div>
+        <div class="ac-desc" style="font-size:.74rem;color:var(--mist);margin:8px 0">${a.desc || 'Custom agent'}</div>
+        <div class="ac-src">${(a.actions||[]).slice(0,3).map(x=>
+          `<span class="src-tag">${{analyse:'🔬 Analyse',correlate:'🔗 Correlate',flag:'🚨 Flag',reconcile:'⚖️ Reconcile',forecast:'📈 Forecast',rank:'🏆 Rank',dedupe:'🧹 Dedupe',summarise:'📋 Summarise'}[x]||x}</span>`
+        ).join('')}</div>
+        <div class="mac-actions">
+          <button class="btn btn-volt btn-sm" style="flex:1;justify-content:center" onclick="launchMyAgent('${a.id}')">Launch →</button>
+          <button class="btn btn-ink btn-sm" onclick="editMyAgent('${a.id}')">✏️ Edit</button>
+          <button class="btn btn-rose btn-sm" onclick="deleteMyAgent('${a.id}')">🗑</button>
+        </div>
+      </div>`).join('');
+  }
+  if (count) count.textContent = S.myAgents.length + ' BUILT';
+}
+
+window.launchMyAgent = function(id) {
+  const a = S.myAgents.find(x => x.id === id);
+  if (!a) return;
+  // Register as a live AGENTS entry so openAgent works
+  AGENTS[id] = {
+    name: a.name, role: 'CUSTOM_AGENT', icon: a.icon,
+    color: a.color, avatarBg: `linear-gradient(135deg,${a.color},${a.color}99)`,
+    sub: a.desc || 'Custom agent', steps: ['Upload your files','Click ⚡ Generate Output'],
+    suggs: ['Analyse my data','Show me key insights','Flag any anomalies','What are the top items?'],
+    defaultPrompt: a.systemPrompt
+  };
+  openAgent(id);
+};
+
+window.editMyAgent = function(id) {
+  const a = S.myAgents.find(x => x.id === id);
+  if (!a) return;
+  openBuilder(a);
+};
+
+window.deleteMyAgent = function(id) {
+  if (!confirm('Delete this agent? This cannot be undone.')) return;
+  S.myAgents = S.myAgents.filter(x => x.id !== id);
+  saveMyAgents();
+  renderMyAgents();
+  toast('🗑 Agent deleted');
+};
+
+// ══════════════════════════════════════════════════════════
+// BUILDER STATE & FUNCTIONS
+// ══════════════════════════════════════════════════════════
+let BLD = {};
+
+function bldReset(prefill) {
+  BLD = {
+    step: 1,
+    id: null,
+    icon: '✦', color: '#b8ff57',
+    name: '', desc: '',
+    srcs: ['csv'], clean: ['none'],
+    fileDescs: [''], colHints: '', understandingNotes: '',
+    rules: [''], sops: [''], extra: '',
+    actions: ['analyse'], params: '',
+    actionRules: [], actionExtra: '',
+    outputs: ['table'], ig: ['auto'], share: ['dashboard'],
+    infographicNotes: '',
+  };
+  if (prefill) Object.assign(BLD, prefill);
+}
+
+window.openBuilder = function(prefill) {
+  bldReset(prefill);
+  bldPopulateFromState();
+  bldGoStep(1);
+  document.getElementById('bld-overlay').classList.add('open');
+  document.getElementById('bld-modal-title').textContent = BLD.id ? '✏️ Edit Agent' : '✦ Build Your Agent';
+};
+
+window.closeBuilder = function() {
+  document.getElementById('bld-overlay').classList.remove('open');
+};
+
+function bldPopulateFromState() {
+  // Step 1
+  const ni = document.getElementById('bld-name'); if (ni) ni.value = BLD.name;
+  const di = document.getElementById('bld-desc'); if (di) di.value = BLD.desc;
+  // icon
+  document.querySelectorAll('#bld-icon-group .chip').forEach(c => {
+    c.classList.toggle('selected', c.dataset.val === BLD.icon);
+  });
+  // color
+  document.querySelectorAll('#bld-color-group .chip').forEach(c => {
+    c.classList.toggle('selected', c.dataset.val === BLD.color);
+  });
+  bldSyncPreview();
+  // Step 2 chips
+  document.querySelectorAll('[data-chipgrp="src"]').forEach(c => {
+    c.classList.toggle('selected', BLD.srcs.includes(c.dataset.val));
+  });
+  const ch = document.getElementById('bld-col-hints'); if (ch) ch.value = BLD.colHints;
+  // Step 4 actions
+  document.querySelectorAll('.action-card').forEach(c => {
+    c.classList.toggle('selected', BLD.actions.includes(c.dataset.val));
+  });
+  const pp = document.getElementById('bld-params'); if (pp) pp.value = BLD.params;
+  // Step 5 outputs
+  document.querySelectorAll('.out-card').forEach(c => {
+    c.classList.toggle('selected', BLD.outputs.includes(c.dataset.val));
+  });
+}
+
+function bldGoStep(n) {
+  BLD.step = n;
+  document.querySelectorAll('.bld-section').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById('bld-s' + n);
+  if (sec) sec.classList.add('active');
+  // stepper
+  document.querySelectorAll('.bld-step').forEach(s => {
+    const sn = +s.dataset.step;
+    s.classList.toggle('active', sn === n);
+    s.classList.toggle('done', sn < n);
+  });
+  document.getElementById('bld-counter').textContent = `Step ${n} of 5`;
+  document.getElementById('bld-back-btn').style.display = n > 1 ? '' : 'none';
+  const nb = document.getElementById('bld-next-btn');
+  nb.textContent = n === 5 ? '✦ Create Agent' : 'Next →';
+  nb.className = n === 5 ? 'btn btn-volt btn-sm' : 'btn btn-volt btn-sm';
+}
+
+window.bldNext = async function() {
+  bldCollectStep(BLD.step);
+  if (BLD.step === 1 && !BLD.name.trim()) { toast('⚠️ Give your agent a name first'); return; }
+  if (BLD.step === 4 && !BLD.actions.length) { toast('⚠️ Pick at least one action'); return; }
+  if (BLD.step < 5) { bldGoStep(BLD.step + 1); return; }
+  // Final — create or update custom agent only (prebuilt agents are never editable here)
+  bldCollectStep(5);
+  await bldSaveAgent();
+};
+
+window.bldBack = function() {
+  bldCollectStep(BLD.step);
+  if (BLD.step > 1) bldGoStep(BLD.step - 1);
+};
+
+function bldCollectStep(n) {
+  if (n === 1) {
+    BLD.name = document.getElementById('bld-name')?.value.trim() || '';
+    BLD.desc = document.getElementById('bld-desc')?.value.trim() || '';
+  }
+  if (n === 2) {
+    BLD.srcs = [...document.querySelectorAll('#bld-s2 .chip.selected')].map(c=>c.dataset.val).filter(Boolean);
+    BLD.fileDescs = [...document.querySelectorAll('#bld-file-rows .file-row input')].map(i=>i.value.trim()).filter(Boolean);
+    BLD.colHints = document.getElementById('bld-col-hints')?.value.trim() || '';
+    BLD.understandingNotes = document.getElementById('bld-understanding-notes')?.value.trim() || '';
+    BLD.clean = [...document.querySelectorAll('#bld-clean-group .chip.selected')].map(c=>c.dataset.val).filter(Boolean);
+  }
+  if (n === 3) {
+    BLD.rules = [...document.querySelectorAll('#bld-rules-rows textarea')].map(t=>t.value.trim()).filter(Boolean);
+    BLD.sops  = [...document.querySelectorAll('#bld-sop-rows textarea')].map(t=>t.value.trim()).filter(Boolean);
+    BLD.extra = document.getElementById('bld-extra')?.value.trim() || '';
+  }
+  if (n === 4) {
+    BLD.actions = [...document.querySelectorAll('.action-card.selected')].map(c=>c.dataset.val).filter(Boolean);
+    BLD.params  = document.getElementById('bld-params')?.value.trim() || '';
+    BLD.actionRules = [...document.querySelectorAll('#bld-action-rules-rows textarea')].map(t=>t.value.trim()).filter(Boolean);
+    BLD.actionExtra = document.getElementById('bld-action-extra')?.value.trim() || '';
+  }
+  if (n === 5) {
+    BLD.outputs = [...document.querySelectorAll('.out-card.selected')].map(c=>c.dataset.val).filter(Boolean);
+    BLD.ig = [...document.querySelectorAll('#bld-ig-group .chip.selected')].map(c=>c.dataset.val).filter(Boolean);
+    if (!BLD.ig.length) BLD.ig = ['auto'];
+    BLD.share = [...document.querySelectorAll('#bld-share-group .chip.selected')].map(c=>c.dataset.val).filter(Boolean);
+    BLD.infographicNotes = document.getElementById('bld-infographic-notes')?.value.trim() || '';
+  }
+}
+
+function bldBuildPrompt() {
+  const ACT = {analyse:'Analyse parameters in depth',correlate:'Find correlations between parameters',flag:'Flag anomalies and threshold breaches',reconcile:'Reconcile records and find discrepancies',forecast:'Forecast trends and project values forward',rank:'Score and rank items by performance',dedupe:'Identify and remove duplicate records',summarise:'Generate executive summary with pivot breakdowns'};
+  const actLines = BLD.actions.map(a => `- ${ACT[a]||a}`).join('\n');
+  const fileCtx  = BLD.fileDescs.filter(Boolean).map((f,i)=>`  File ${i+1}: ${f}`).join('\n');
+  const ruleCtx  = (BLD.rules||[]).filter(Boolean).map(r=>`  RULE: ${r}`).join('\n');
+  const sopCtx   = (BLD.sops||[]).filter(Boolean).map(s=>`  SOP: ${s}`).join('\n');
+  const aRules   = (BLD.actionRules||[]).filter(Boolean).map(r=>`  • ${r}`).join('\n');
+  const igStyle  = {auto:'Auto — AI picks best format for the data',exec:'Executive Summary card',heatmap:'Performance Heatmap',timeline:'Trend Timeline',funnel:'Funnel/Pipeline',scorecard:'Scorecard'}[(BLD.ig||['auto'])[0]] || 'auto';
+
+  return `You are ${BLD.name}, a custom DataBro agentic AI.
+Role: ${BLD.desc || 'Analyse the uploaded data and generate actionable business insights.'}
+
+CRITICAL RULES:
+1. You have FULL ACCESS to all uploaded datasets — every row is provided in this conversation.
+2. NEVER ask the user to paste data, describe columns, or provide rows. Always compute from the data.
+3. NEVER modify or suggest editing pre-built DataBro agents (Sales Planner, Finance Guardian, Inventory Auditor).
+
+${BLD.colHints ? `── COLUMN DEFINITIONS & UNDERSTANDING ──
+${BLD.colHints}
+${BLD.understandingNotes ? BLD.understandingNotes : ''}` : ''}
+${ruleCtx ? `── BUSINESS RULES (FOLLOW EXACTLY) ──
+${ruleCtx}` : ''}
+${sopCtx ? `── STANDARD OPERATING PROCEDURES ──
+${sopCtx}` : ''}
+${fileCtx ? `── EXPECTED DATA FILES ──
+${fileCtx}` : ''}
+
+── YOUR TASKS ──
+${actLines}
+${BLD.params ? `Specific parameters: ${BLD.params}` : ''}
+${aRules ? `Action rules:\n${aRules}` : ''}
+${BLD.actionExtra ? `Action instructions: ${BLD.actionExtra}` : ''}
+
+── OUTPUT & INFOGRAPHICS ──
+Output format: ${(BLD.outputs||['table']).join(', ')}
+Infographic style: ${igStyle}
+IMPORTANT: Infographics must be generated from the ANALYSIS OUTPUT data — NOT from raw input files.
+${BLD.infographicNotes ? `Infographic notes: ${BLD.infographicNotes}` : ''}
+
+${BLD.extra ? `── ADDITIONAL INSTRUCTIONS ──\n${BLD.extra}` : ''}
+
+Always lead with a summary table, then numbered insights with specific figures from the data.`;
+}
+
+async function bldSaveAgent() {
+  const id = BLD.id || ('ca_' + Date.now());
+  const agent = {
+    id, name: BLD.name, desc: BLD.desc,
+    icon: BLD.icon, color: BLD.color,
+    srcs: BLD.srcs, actions: BLD.actions,
+    outputs: BLD.outputs, ig: BLD.ig, share: BLD.share,
+    rules: BLD.rules || [], sops: BLD.sops || [],
+    fileDescs: BLD.fileDescs || [],
+    colHints: BLD.colHints || '',
+    understandingNotes: BLD.understandingNotes || '',
+    actionRules: BLD.actionRules || [],
+    actionExtra: BLD.actionExtra || '',
+    infographicNotes: BLD.infographicNotes || '',
+    systemPrompt: bldBuildPrompt(),
+    createdAt: new Date().toISOString()
+  };
+  const idx = S.myAgents.findIndex(x => x.id === id);
+  if (idx > -1) S.myAgents[idx] = agent;
+  else S.myAgents.unshift(agent);
+  saveMyAgents();
+
+  // Also sync to backend if logged in
+  if (S.sessionToken) {
+    const payload = {
+      name: BLD.name, description: BLD.desc, icon: BLD.icon, color: BLD.color,
+      sources: BLD.srcs, file_descriptions: BLD.fileDescs || [], clean: BLD.clean || [],
+      column_metadata: BLD.colHints || '', understanding_notes: BLD.understandingNotes || '',
+      business_rules: BLD.rules || [], sops: BLD.sops || [], extra_instructions: BLD.extra || '',
+      actions: BLD.actions, action_parameters: BLD.params || '',
+      action_business_rules: BLD.actionRules || [], action_extra: BLD.actionExtra || '',
+      outputs: BLD.outputs, infographic_style: BLD.ig || ['auto'],
+      infographic_notes: BLD.infographicNotes || '',
+      share_destinations: BLD.share || ['dashboard'], params: {}
+    };
+    const method = BLD.id ? 'PUT' : 'POST';
+    const path = BLD.id ? `/agents/custom/${BLD.id}` : '/agents/custom';
+    await tryBackend(path, { method, body: JSON.stringify(payload) });
+  }
+
+  closeBuilder();
+  renderMyAgents();
+  toast(`✅ Agent "${agent.name}" ${BLD.id ? 'updated' : 'created'}!`);
+}
+
+// ── Builder UI helpers ──────────────────────────────────
+window.bldSyncPreview = function() {
+  const name = document.getElementById('bld-name')?.value.trim() || 'Your Agent';
+  const desc = document.getElementById('bld-desc')?.value.trim() || 'Agent description will appear here';
+  setText('bld-prev-name', name);
+  setText('bld-prev-role', name.toUpperCase().replace(/\s+/g,'_').replace(/[^A-Z0-9_]/g,'') + '_AGENT');
+  setText('bld-prev-desc', desc);
+  BLD.name = name; BLD.desc = desc;
+};
+
+window.bldPickIcon = function(el) {
+  document.querySelectorAll('#bld-icon-group .chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  BLD.icon = el.dataset.val;
+  const pi = document.getElementById('bld-prev-icon'); if(pi) pi.textContent = BLD.icon;
+};
+
+window.bldPickColor = function(el) {
+  document.querySelectorAll('#bld-color-group .chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  BLD.color = el.dataset.val;
+  const pi = document.getElementById('bld-prev-icon');
+  if(pi) pi.style.background = BLD.color + '22';
+};
+
+window.bldToggleChip = function(el, grp) {
+  el.classList.toggle('selected');
+};
+
+window.bldToggleAction = function(el) {
+  el.classList.toggle('selected');
+};
+
+window.bldToggleOut = function(el) {
+  el.classList.toggle('selected');
+};
+
+window.bldAddFileRow = function() {
+  const row = document.createElement('div');
+  row.className = 'file-row';
+  row.innerHTML = '<input class="fi" placeholder="e.g. Sales CSV with columns: Date, Rep, Customer, Amount, Region"><button class="file-row-remove" onclick="this.parentElement.remove()">✕</button>';
+  document.getElementById('bld-file-rows').appendChild(row);
+};
+
+window.bldAddRuleRow = function(containerId) {
+  const container = document.getElementById(containerId);
+  const row = document.createElement('div');
+  row.className = 'rule-row';
+  row.innerHTML = '<textarea rows="2" placeholder="Write your rule in plain language…"></textarea><button class="file-row-remove" style="align-self:flex-start;margin-top:1px" onclick="this.parentElement.remove()">✕</button>';
+  container.appendChild(row);
+};
+
+// ══════════════════════════════════════════════════════════
+// TEMPLATE LIBRARY
+// ══════════════════════════════════════════════════════════
+const TEMPLATES = [
+  // Finance — highest ROI
+  {id:'fin1',cat:'finance',icon:'🛡️',color:'#34d399',name:'Finance-Guardian',
+   desc:'Auto-reconciles actuals vs budget, flags variances >15%, detects duplicate payments. Output: Monthly variance report + flagged items table → Email to finance head.',
+   srcs:['csv','erp'],actions:['reconcile','flag','analyse'],outputs:['table','pdf'],share:['email'],ig:['scorecard'],
+   rules:['Flag any variance between actuals and budget greater than 15%','Flag any duplicate payment — same amount, same vendor, within 30 days','Any line item with variance > 25% is marked CRITICAL and escalated immediately'],
+   sops:['Send monthly variance report to finance head at end of each month','Flagged duplicate payments must be listed in a separate table with Invoice No, Vendor, Amount, Dates'],
+   fileDescs:['P&L Excel with columns: Month, Category, Actual Amount, Budget Amount, Variance','Budget Sheets: Department, Budget Head, Allocated Amount, Period','Bank CSV with Date, Description, Debit, Credit, Balance, Reference No'],
+   colHints:"'Actual Amount' = real spend. 'Budget Amount' = approved budget. Always compare these two columns for variance. 'Reference No' in Bank CSV is used to detect duplicates.",
+   tags:['P&L','Budget','Reconcile','Variance','Duplicates','Finance']},
+  {id:'fin2',cat:'finance',icon:'💰',color:'#fbbf24',name:'CashFlow-Tracker',
+   desc:'Predicts cash runway (30/60/90 days), flags overdue payments >30 days. Output: Cashflow dashboard + overdue alerts → WhatsApp/Slack.',
+   srcs:['csv','bank'],actions:['forecast','flag','analyse'],outputs:['chart','table'],share:['slack','whatsapp'],ig:['timeline'],
+   rules:['Flag any payment overdue by more than 30 days as HIGH RISK','Flag any payment overdue by more than 60 days as CRITICAL','Alert when projected 30-day runway falls below 2x monthly burn rate'],
+   sops:['Calculate runway = Current Cash Balance / Average Monthly Burn Rate','Provide 30, 60, and 90 day projections separately','Send overdue alerts to WhatsApp/Slack immediately on detection'],
+   fileDescs:['AR/AP Excel: Invoice No, Invoice Date, Due Date, Amount, Status (Paid/Pending/Overdue), Customer or Vendor Name','Bank statement CSV: Date, Description, Debit, Credit, Running Balance'],
+   colHints:"'Due Date' is the payment deadline. 'Status' = Paid, Pending, or Overdue. Calculate days overdue as: today minus Due Date. 'Debit' = money out, 'Credit' = money in.",
+   tags:['Cashflow','Runway','AR/AP','Overdue','Forecast','Finance']},
+  {id:'fin3',cat:'finance',icon:'🧾',color:'#fb923c',name:'Expense-Auditor',
+   desc:'Detects policy violations (e.g. meals >₹500), flags unapproved spends. Output: Expense summary + red-flagged items → Approval workflow.',
+   srcs:['csv'],actions:['flag','analyse','rank'],outputs:['table','pdf'],share:['email'],ig:['scorecard'],
+   rules:['Flag any meal expense above ₹500 as a policy violation','Flag any expense submission without a matching approval entry as UNAPPROVED SPEND','Flag any expense claimed more than 30 days after the expense date as LATE SUBMISSION','Rank employees by total flagged expenses — top 5 are high-risk'],
+   sops:['Red-flagged items must be listed in a separate table: Employee, Category, Amount, Date, Reason Flagged','Unapproved spends above ₹5,000 require immediate escalation to department head','Summary must show: total expenses, total flagged amount, % policy violations'],
+   fileDescs:['Expense receipts Excel: Date, Employee Name, Category, Amount, Description, Submitted By, Approved By (blank if unapproved)','Approval logs: Employee Name, Expense ID, Approval Date, Approved By, Status','Budget sheet: Department, Category, Monthly Budget'],
+   colHints:"'Category' includes: Meals, Travel, Hotel, Office Supplies, Entertainment. 'Approved By' — if blank or empty, expense is unapproved. 'Amount' is always in INR.",
+   tags:['Expenses','Policy','Violations','Audit','Unapproved','Finance']},
+  // Sales
+  {id:'sal1',cat:'sales',icon:'📈',color:'#b8ff57',name:'Sales-Forecaster',
+   desc:'Predicts quarterly revenue, flags deals at risk of slipping',
+   srcs:['csv','crm'],actions:['forecast','flag','rank'],outputs:['chart','table'],share:['email'],ig:['funnel'],
+   rules:['Flag any deal with close date in next 30 days and probability below 30% as at-risk'],
+   fileDescs:['Sales pipeline Excel: Deal Name, Value, Close Date, Stage, Probability, Rep'],
+   tags:['Forecast','Pipeline','Revenue','Risk']},
+  {id:'sal2',cat:'sales',icon:'👥',color:'#38bdf8',name:'Lead-Cleaner',
+   desc:'Deduplicates leads, scores by engagement, flags stale leads over 90 days',
+   srcs:['csv','crm'],actions:['dedupe','rank','flag'],outputs:['csv','table'],share:['email'],ig:['scorecard'],
+   rules:['Flag leads with no activity in 90+ days as stale','Score leads: email opened=1pt, call made=2pt, demo done=5pt'],
+   fileDescs:['Leads Excel: Name, Email, Phone, Source, Last Contact Date, Stage'],
+   tags:['Leads','Dedup','Scoring','CRM']},
+  {id:'sal3',cat:'sales',icon:'🚨',color:'#fb7185',name:'Customer-Churn-Alert',
+   desc:'Predicts churn risk from low purchases + complaints, suggests retention actions',
+   srcs:['csv'],actions:['flag','rank','forecast'],outputs:['table','pdf'],share:['email'],ig:['scorecard'],
+   rules:['Flag customers with zero purchases in last 60 days AND 2+ support tickets as HIGH churn risk'],
+   fileDescs:['Customer list with Last Purchase Date, Purchase Count, Support Tickets, Revenue'],
+   tags:['Churn','Retention','Risk','CRM']},
+  // Ops
+  {id:'ops1',cat:'ops',icon:'📦',color:'#a78bfa',name:'Inventory-Replenisher',
+   desc:'Flags low stock under 7 days supply, suggests reorder quantities, calculates EOQ',
+   srcs:['csv','erp'],actions:['flag','analyse','summarise'],outputs:['table','csv'],share:['email'],ig:['scorecard'],
+   rules:['Flag any SKU with less than 7 days of stock remaining as LOW STOCK','Calculate EOQ = sqrt(2 x Annual Demand x Order Cost / Holding Cost) for each SKU'],
+   fileDescs:['Inventory Excel: SKU, Product Name, Current Stock, Daily Sales Rate, Reorder Point, Lead Time'],
+   tags:['Inventory','Reorder','EOQ','Stock']},
+  {id:'ops2',cat:'ops',icon:'🚚',color:'#34d399',name:'Delivery-Optimizer',
+   desc:'Identifies late deliveries by area, flags bottleneck routes',
+   srcs:['csv'],actions:['flag','analyse','rank'],outputs:['chart','table'],share:['email'],ig:['heatmap'],
+   rules:['Flag any delivery delayed by more than 2 days vs promised date','Rank delivery areas by average delay — worst 3 are bottlenecks'],
+   fileDescs:['Orders Excel: Order ID, Customer Area, Promised Date, Actual Delivery Date, Driver, Route'],
+   tags:['Delivery','Logistics','Routes','Delays']},
+  // HR
+  {id:'hr1',cat:'hr',icon:'👥',color:'#fbbf24',name:'Payroll-Validator',
+   desc:'Validates payroll calculations, flags overtime anomalies',
+   srcs:['csv'],actions:['reconcile','flag','analyse'],outputs:['table','pdf'],share:['email'],ig:['scorecard'],
+   rules:['Flag any employee where calculated pay differs from payroll sheet by more than Rs 100','Flag overtime hours above 20 per month as an anomaly requiring approval'],
+   fileDescs:['Attendance Excel: Employee ID, Name, Days Present, Hours Worked, Leave Taken','Salary sheet: Employee ID, Base Salary, Rate per Hour, Allowances'],
+   tags:['Payroll','HR','Attendance','Overtime']},
+  {id:'hr2',cat:'hr',icon:'🎯',color:'#38bdf8',name:'Recruitment-Tracker',
+   desc:'Tracks hiring funnel, flags bottlenecks, predicts time-to-hire',
+   srcs:['csv'],actions:['analyse','flag','forecast'],outputs:['chart','table'],share:['email'],ig:['funnel'],
+   rules:['Flag any open position that has been in screening stage for more than 14 days as a bottleneck'],
+   fileDescs:['Job applications CSV: Candidate, Role, Applied Date, Current Stage, Interviewer, Offer Status'],
+   tags:['Recruitment','Hiring','Funnel','HR']},
+  // Marketing
+  {id:'mkt1',cat:'marketing',icon:'🎯',color:'#fb923c',name:'Campaign-ROI-Analyzer',
+   desc:'Calculates CAC, ROAS per channel, recommends budget reallocation',
+   srcs:['csv'],actions:['analyse','correlate','rank'],outputs:['chart','table'],share:['email'],ig:['scorecard'],
+   rules:['Flag any channel with ROAS below 1.5x as underperforming','Recommend reallocating budget from bottom 2 channels to top performer'],
+   fileDescs:['Ad spend Excel: Channel, Spend, Impressions, Clicks, Conversions, Revenue'],
+   tags:['Marketing','CAC','ROAS','Budget']},
+  {id:'mkt2',cat:'marketing',icon:'💎',color:'#a78bfa',name:'Customer-Lifetime-Analyzer',
+   desc:'Segments customers into VIP/at-risk/one-time, calculates LTV',
+   srcs:['csv'],actions:['rank','analyse','flag'],outputs:['table','pdf'],share:['email'],ig:['scorecard'],
+   rules:['VIP: 5+ orders OR total spend > Rs 50000','At-risk: last order 90+ days ago AND previous purchase history','One-time: exactly 1 order ever'],
+   fileDescs:['Purchase history: Customer ID, Name, Order Date, Order Value, Product Category'],
+   tags:['LTV','Segments','VIP','Retention']},
+];
+
+let tlibCat = 'all';
+
+window.openTlib = function() {
+  renderTlib();
+  document.getElementById('tlib-overlay').classList.add('open');
+};
+window.closeTlib = function() {
+  document.getElementById('tlib-overlay').classList.remove('open');
+};
+window.setTlibCat = function(el, cat) {
+  tlibCat = cat;
+  document.querySelectorAll('.tlib-cat').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderTlib();
+};
+
+function renderTlib() {
+  const q = (document.getElementById('tlib-search')?.value || '').toLowerCase();
+  const groups = {finance:'💰 Finance & Accounting', sales:'📈 Sales & CRM', ops:'📦 Operations', hr:'👥 HR & Workforce', marketing:'🎯 Marketing'};
+  let html = '';
+  Object.entries(groups).forEach(([cat, label]) => {
+    if (tlibCat !== 'all' && tlibCat !== cat) return;
+    const items = TEMPLATES.filter(t => t.cat === cat && (!q || t.name.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || (t.tags||[]).some(tg=>tg.toLowerCase().includes(q))));
+    if (!items.length) return;
+    html += `<div class="tlib-group-title">${label}</div>`;
+    items.forEach(t => {
+      html += `<div class="tlib-card">
+        <div class="tlib-card-hdr">
+          <div class="tlib-card-icon" style="background:${t.color}22">${t.icon}</div>
+          <div><div class="tlib-card-name">${t.name}</div><div class="tlib-card-role">${t.cat.toUpperCase()}_AGENT</div></div>
+        </div>
+        <div class="tlib-card-desc">${t.desc}</div>
+        <div class="tlib-card-tags">${(t.tags||[]).map(tg=>`<span class="tlib-tag">${tg}</span>`).join('')}</div>
+        <button class="tlib-use-btn" onclick="useTpl('${t.id}')">Use this template →</button>
+      </div>`;
+    });
+  });
+  const body = document.getElementById('tlib-body');
+  if (body) body.innerHTML = html || '<div style="color:var(--mist);font-size:.8rem;text-align:center;padding:32px">No templates match your search.</div>';
+}
+
+window.useTpl = function(id) {
+  const t = TEMPLATES.find(x => x.id === id);
+  if (!t) return;
+  closeTlib();
+  openBuilder({
+    icon: t.icon, color: t.color,
+    name: t.name, desc: t.desc,
+    srcs: t.srcs, actions: t.actions,
+    outputs: t.outputs, ig: t.ig, share: t.share,
+    rules: t.rules || [''], sops: t.sops || [''],
+    fileDescs: t.fileDescs || [''],
+    colHints: t.colHints || '',
+    understandingNotes: t.understandingNotes || '',
+    actionRules: t.actionRules || [],
+    actionExtra: t.actionExtra || '',
+    infographicNotes: t.infographicNotes || '',
+    extra: t.extra || '', params: t.params || ''
+  });
+};
+
+// Init on dashboard load
+const _origLogin = loginSuccess;
+// Re-render my agents whenever dashboard loads
+const _origGoPage = window.goPage;
+window.goPage = function(id) {
+  _origGoPage(id);
+  if (id === 'page-dashboard') renderMyAgents();
+};
+// Initial render
+renderMyAgents();
+
 </script>
+
+<!-- ═══════════════════ AGENT BUILDER MODAL ═══════════════════ -->
+<div class="bld-overlay" id="bld-overlay">
+  <div class="bld-modal">
+    <div class="bld-hdr">
+      <div class="bld-hdr-row">
+        <div class="bld-title" id="bld-modal-title">✦ Build Your Agent</div>
+        <button class="bld-close" onclick="closeBuilder()">✕ Close</button>
+      </div>
+      <div class="bld-stepper" id="bld-stepper">
+        <div class="bld-step active" data-step="1"><div class="bld-step-dot">1</div><div class="bld-step-lbl">Identity</div></div>
+        <div class="bld-step-line"></div>
+        <div class="bld-step" data-step="2"><div class="bld-step-dot">2</div><div class="bld-step-lbl">Data</div></div>
+        <div class="bld-step-line"></div>
+        <div class="bld-step" data-step="3"><div class="bld-step-dot">3</div><div class="bld-step-lbl">Rules</div></div>
+        <div class="bld-step-line"></div>
+        <div class="bld-step" data-step="4"><div class="bld-step-dot">4</div><div class="bld-step-lbl">Actions</div></div>
+        <div class="bld-step-line"></div>
+        <div class="bld-step" data-step="5"><div class="bld-step-dot">5</div><div class="bld-step-lbl">Output</div></div>
+      </div>
+    </div>
+    <div class="bld-body">
+
+      <!-- STEP 1: Identity -->
+      <div class="bld-section active" id="bld-s1">
+        <div class="bld-sh">Agent Identity</div>
+        <div class="bld-ss">Give your agent a name, description, and visual identity.</div>
+        <div class="fg"><label class="fl">Agent Name *</label><input class="fi" id="bld-name" placeholder="e.g. CashFlow Tracker, Expense Auditor…" oninput="bldSyncPreview()"></div>
+        <div class="fg"><label class="fl">What does this agent do?</label><textarea class="fi" id="bld-desc" rows="2" placeholder="e.g. Monitors cashflow, flags overdue payments and predicts 30/60/90 day runway" style="resize:none" oninput="bldSyncPreview()"></textarea></div>
+        <div class="fg"><label class="fl">Pick an Icon</label>
+          <div class="chip-group" id="bld-icon-group">
+            <div class="chip selected" data-val="✦" onclick="bldPickIcon(this)">✦</div>
+            <div class="chip" data-val="📊" onclick="bldPickIcon(this)">📊</div>
+            <div class="chip" data-val="🛡️" onclick="bldPickIcon(this)">🛡️</div>
+            <div class="chip" data-val="💰" onclick="bldPickIcon(this)">💰</div>
+            <div class="chip" data-val="📦" onclick="bldPickIcon(this)">📦</div>
+            <div class="chip" data-val="👥" onclick="bldPickIcon(this)">👥</div>
+            <div class="chip" data-val="📈" onclick="bldPickIcon(this)">📈</div>
+            <div class="chip" data-val="🔍" onclick="bldPickIcon(this)">🔍</div>
+            <div class="chip" data-val="🧾" onclick="bldPickIcon(this)">🧾</div>
+            <div class="chip" data-val="⚡" onclick="bldPickIcon(this)">⚡</div>
+            <div class="chip" data-val="🎯" onclick="bldPickIcon(this)">🎯</div>
+            <div class="chip" data-val="🚚" onclick="bldPickIcon(this)">🚚</div>
+            <div class="chip" data-val="🏭" onclick="bldPickIcon(this)">🏭</div>
+            <div class="chip" data-val="📋" onclick="bldPickIcon(this)">📋</div>
+            <div class="chip" data-val="🤖" onclick="bldPickIcon(this)">🤖</div>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">Accent Colour</label>
+          <div class="chip-group" id="bld-color-group">
+            <div class="chip selected" data-val="#b8ff57" onclick="bldPickColor(this)" style="background:rgba(184,255,87,.2);border-color:#b8ff57;color:#b8ff57">● Volt</div>
+            <div class="chip" data-val="#fbbf24" onclick="bldPickColor(this)" style="color:#fbbf24">● Amber</div>
+            <div class="chip" data-val="#34d399" onclick="bldPickColor(this)" style="color:#34d399">● Emerald</div>
+            <div class="chip" data-val="#38bdf8" onclick="bldPickColor(this)" style="color:#38bdf8">● Azure</div>
+            <div class="chip" data-val="#fb7185" onclick="bldPickColor(this)" style="color:#fb7185">● Rose</div>
+            <div class="chip" data-val="#a78bfa" onclick="bldPickColor(this)" style="color:#a78bfa">● Purple</div>
+            <div class="chip" data-val="#fb923c" onclick="bldPickColor(this)" style="color:#fb923c">● Orange</div>
+          </div>
+        </div>
+        <!-- Live preview -->
+        <div class="bld-preview" id="bld-preview">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div id="bld-prev-icon" style="width:40px;height:40px;border-radius:10px;background:rgba(184,255,87,.12);display:flex;align-items:center;justify-content:center;font-size:1.3rem">✦</div>
+            <div><div class="bld-preview-name" id="bld-prev-name">Your Agent</div><div style="font-family:'JetBrains Mono',monospace;font-size:.54rem;color:var(--fog)" id="bld-prev-role">CUSTOM_AGENT</div></div>
+          </div>
+          <div class="bld-preview-desc" id="bld-prev-desc">Agent description will appear here</div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Data Sources -->
+      <div class="bld-section" id="bld-s2">
+        <div class="bld-sh">Data Sources</div>
+        <div class="bld-ss">Choose how this agent gets its data. You can select multiple sources. Once your first file or link is added, you can add more below.</div>
+        <label class="fl">Source type — select all that apply</label>
+        <div class="chip-group" id="bld-src-group">
+          <div class="chip selected" data-val="csv" onclick="bldToggleChip(this,'src')">📄 Upload CSV/Excel</div>
+          <div class="chip" data-val="json" onclick="bldToggleChip(this,'src')">📋 Upload JSON</div>
+          <div class="chip" data-val="gsheet" onclick="bldToggleChip(this,'src')">📗 Google Sheets</div>
+          <div class="chip" data-val="sharepoint" onclick="bldToggleChip(this,'src')">☁️ SharePoint</div>
+          <div class="chip" data-val="onedrive" onclick="bldToggleChip(this,'src')">🗂️ OneDrive</div>
+          <div class="chip" data-val="bank" onclick="bldToggleChip(this,'src')">🏦 Bank CSV</div>
+          <div class="chip" data-val="erp" onclick="bldToggleChip(this,'src')">🏭 ERP Export</div>
+          <div class="chip" data-val="crm" onclick="bldToggleChip(this,'src')">👥 CRM Export</div>
+          <div class="chip" data-val="api" onclick="bldToggleChip(this,'src')">⚡ Live API/Webhook</div>
+        </div>
+        <label class="fl" style="margin-top:14px;margin-bottom:7px">Describe your files — one per line <span style="color:var(--fog);font-weight:400">(what does each file contain?)</span></label>
+        <div id="bld-file-rows">
+          <div class="file-row"><input class="fi" placeholder="e.g. Monthly P&L Excel with columns: Date, Revenue, COGS, OPEX, Net Profit"><button class="file-row-remove" onclick="this.parentElement.remove()">✕</button></div>
+        </div>
+        <button class="add-row-btn" onclick="bldAddFileRow()">+ Add another file / source</button>
+
+        <div style="margin-top:18px;padding:14px;background:rgba(184,255,87,.04);border:1px solid rgba(184,255,87,.12);border-radius:12px">
+          <label class="fl" style="margin-bottom:7px;color:var(--volt)">📖 Help the agent understand your data <span style="color:var(--fog);font-weight:400;text-transform:none;letter-spacing:0">(optional but recommended)</span></label>
+          <label class="fl" style="margin-bottom:5px">Column meanings & definitions</label>
+          <textarea class="fi" id="bld-col-hints" rows="3" style="resize:none;margin-bottom:10px" placeholder="e.g. 'Amount' = invoice value in INR. 'Status' can be: Paid, Pending, Overdue. 'Rep' is the sales rep, NOT the customer name. Always use 'Inv_Date' for invoice dates, not 'Date'."></textarea>
+          <label class="fl" style="margin-bottom:5px">Any other data context or notes</label>
+          <textarea class="fi" id="bld-understanding-notes" rows="2" style="resize:none" placeholder="e.g. Weekend entries can be ignored. Rows where Status = 'Draft' should be excluded from calculations. The 'BU' column means Business Unit."></textarea>
+        </div>
+
+        <label class="fl" style="margin-top:14px;margin-bottom:7px">Data cleaning needed?</label>
+        <div class="chip-group" id="bld-clean-group">
+          <div class="chip" data-val="dedup" onclick="bldToggleChip(this,'clean')">🧹 Remove duplicates</div>
+          <div class="chip" data-val="nulls" onclick="bldToggleChip(this,'clean')">🔧 Handle nulls</div>
+          <div class="chip" data-val="types" onclick="bldToggleChip(this,'clean')">🔄 Fix data types</div>
+          <div class="chip" data-val="trim" onclick="bldToggleChip(this,'clean')">✂️ Trim whitespace</div>
+          <div class="chip" data-val="std" onclick="bldToggleChip(this,'clean')">📐 Standardise formats</div>
+          <div class="chip selected" data-val="none" onclick="bldToggleChip(this,'clean')">✓ No cleaning needed</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Business Rules -->
+      <div class="bld-section" id="bld-s3">
+        <div class="bld-sh">Business Rules & SOPs</div>
+        <div class="bld-ss">Write your rules in plain language — the AI will follow them exactly. Be as specific as you like.</div>
+        <label class="fl" style="margin-bottom:7px">Thresholds & flag rules</label>
+        <div id="bld-rules-rows">
+          <div class="rule-row"><textarea rows="2" placeholder="e.g. Flag any expense above ₹500 for meals as a policy violation"></textarea><button class="file-row-remove" style="align-self:flex-start;margin-top:1px" onclick="this.parentElement.remove()">✕</button></div>
+        </div>
+        <button class="add-row-btn" onclick="bldAddRuleRow('bld-rules-rows')">+ Add rule</button>
+        <label class="fl" style="margin-top:6px;margin-bottom:7px">Standard Operating Procedures (SOPs)</label>
+        <div id="bld-sop-rows">
+          <div class="rule-row"><textarea rows="2" placeholder="e.g. When a payment is overdue by more than 30 days, escalate and mark as HIGH RISK"></textarea><button class="file-row-remove" style="align-self:flex-start;margin-top:1px" onclick="this.parentElement.remove()">✕</button></div>
+        </div>
+        <button class="add-row-btn" onclick="bldAddRuleRow('bld-sop-rows')">+ Add SOP</button>
+        <label class="fl" style="margin-top:6px;margin-bottom:7px">Any other instructions for the AI</label>
+        <textarea class="fi" id="bld-extra" rows="3" style="resize:none" placeholder="e.g. Always show totals in INR. Group results by region. If data is missing for a field, mark it as 'N/A' not blank."></textarea>
+      </div>
+
+      <!-- STEP 4: Actions -->
+      <div class="bld-section" id="bld-s4">
+        <div class="bld-sh">What should this agent do?</div>
+        <div class="bld-ss">Select all actions this agent should perform. You can pick multiple.</div>
+        <div class="action-grid">
+          <div class="action-card selected" data-val="analyse" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">🔬</div>
+            <div class="ac-card-name">Analyse Parameters</div>
+            <div class="ac-card-desc">Deep-dive into specific columns or KPIs you define</div>
+          </div>
+          <div class="action-card" data-val="correlate" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">🔗</div>
+            <div class="ac-card-name">Define Correlations</div>
+            <div class="ac-card-desc">Find relationships between two or more parameters</div>
+          </div>
+          <div class="action-card" data-val="flag" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">🚨</div>
+            <div class="ac-card-name">Flag Anomalies</div>
+            <div class="ac-card-desc">Detect outliers, threshold breaches, policy violations</div>
+          </div>
+          <div class="action-card" data-val="reconcile" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">⚖️</div>
+            <div class="ac-card-name">Reconcile & Match</div>
+            <div class="ac-card-desc">Cross-check records across files, find mismatches</div>
+          </div>
+          <div class="action-card" data-val="forecast" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">📈</div>
+            <div class="ac-card-name">Forecast & Predict</div>
+            <div class="ac-card-desc">Project trends, runway, pipeline values forward</div>
+          </div>
+          <div class="action-card" data-val="rank" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">🏆</div>
+            <div class="ac-card-name">Score & Rank</div>
+            <div class="ac-card-desc">Rank items by performance, risk, or priority score</div>
+          </div>
+          <div class="action-card" data-val="dedupe" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">🧹</div>
+            <div class="ac-card-name">Deduplicate & Clean</div>
+            <div class="ac-card-desc">Remove duplicates, standardise, fill gaps</div>
+          </div>
+          <div class="action-card" data-val="summarise" onclick="bldToggleAction(this)">
+            <div class="ac-card-icon">📋</div>
+            <div class="ac-card-name">Summarise & Report</div>
+            <div class="ac-card-desc">Executive summary with pivot breakdowns</div>
+          </div>
+        </div>
+        <label class="fl" style="margin-top:14px;margin-bottom:7px">Specific parameters to analyse / correlate <span style="color:var(--fog);font-weight:400">(optional)</span></label>
+        <textarea class="fi" id="bld-params" rows="2" style="resize:none" placeholder="e.g. Analyse: Revenue vs Target. Correlate: Rep Name with Region Sales. Flag: Amount > 50,000."></textarea>
+
+        <div style="margin-top:18px;padding:14px;background:rgba(251,145,60,.04);border:1px solid rgba(251,145,60,.14);border-radius:12px">
+          <label class="fl" style="margin-bottom:7px;color:var(--orange)">📋 Action-level Business Rules & SOPs <span style="color:var(--fog);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <div class="bld-ss" style="margin-bottom:10px">Write action-specific rules in plain language — the AI will apply these when performing the actions above.</div>
+          <div id="bld-action-rules-rows">
+            <div class="rule-row"><textarea rows="2" placeholder="e.g. When correlating Revenue and Marketing Spend, group results by quarter not month"></textarea><button class="file-row-remove" style="align-self:flex-start;margin-top:1px" onclick="this.parentElement.remove()">✕</button></div>
+          </div>
+          <button class="add-row-btn" onclick="bldAddRuleRow('bld-action-rules-rows')">+ Add action rule</button>
+          <label class="fl" style="margin-top:10px;margin-bottom:5px">Any other action instructions</label>
+          <textarea class="fi" id="bld-action-extra" rows="2" style="resize:none" placeholder="e.g. Always show variance as both % and absolute INR. Rank by descending value. Only flag anomalies above ₹50,000."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 5: Output -->
+      <div class="bld-section" id="bld-s5">
+        <div class="bld-sh">Output & Infographics</div>
+        <div class="bld-ss">Choose what the agent delivers. Infographics will be generated from the <strong style="color:#fff">analysis output</strong> — not from your raw input files.</div>
+        <label class="fl" style="margin-bottom:7px">Output type — select all that apply</label>
+        <div class="out-grid">
+          <div class="out-card selected" data-val="table" onclick="bldToggleOut(this)"><div class="out-card-icon">📋</div><div class="out-card-name">Data Table</div></div>
+          <div class="out-card" data-val="chart" onclick="bldToggleOut(this)"><div class="out-card-icon">📊</div><div class="out-card-name">Charts</div></div>
+          <div class="out-card" data-val="pdf" onclick="bldToggleOut(this)"><div class="out-card-icon">📄</div><div class="out-card-name">PDF Report</div></div>
+          <div class="out-card" data-val="csv" onclick="bldToggleOut(this)"><div class="out-card-icon">💾</div><div class="out-card-name">Download CSV</div></div>
+          <div class="out-card" data-val="email" onclick="bldToggleOut(this)"><div class="out-card-icon">✉️</div><div class="out-card-name">Email Report</div></div>
+          <div class="out-card" data-val="chat" onclick="bldToggleOut(this)"><div class="out-card-icon">💬</div><div class="out-card-name">Chat Summary</div></div>
+        </div>
+
+        <div style="margin-top:18px;padding:14px;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.14);border-radius:12px">
+          <label class="fl" style="margin-bottom:7px;color:var(--azure)">📊 Infographic preferences <span style="color:var(--fog);font-weight:400;text-transform:none;letter-spacing:0">— based on output data, not input files</span></label>
+          <div class="chip-group" id="bld-ig-group">
+            <div class="chip selected" data-val="auto" onclick="bldToggleChip(this,'ig')">🤖 Auto (AI picks best)</div>
+            <div class="chip" data-val="exec" onclick="bldToggleChip(this,'ig')">📑 Executive Summary</div>
+            <div class="chip" data-val="heatmap" onclick="bldToggleChip(this,'ig')">🟥 Performance Heatmap</div>
+            <div class="chip" data-val="timeline" onclick="bldToggleChip(this,'ig')">📅 Trend Timeline</div>
+            <div class="chip" data-val="funnel" onclick="bldToggleChip(this,'ig')">🔻 Funnel / Pipeline</div>
+            <div class="chip" data-val="scorecard" onclick="bldToggleChip(this,'ig')">🏅 Scorecard</div>
+          </div>
+          <label class="fl" style="margin-top:10px;margin-bottom:5px">What should the infographic highlight?</label>
+          <textarea class="fi" id="bld-infographic-notes" rows="2" style="resize:none" placeholder="e.g. Show bar chart of variance by department. Pie chart of flagged vs clean transactions. Highlight top 5 violators in red. Trend line for 90-day runway."></textarea>
+        </div>
+
+        <label class="fl" style="margin-top:14px;margin-bottom:7px">Send output to</label>
+        <div class="chip-group" id="bld-share-group">
+          <div class="chip selected" data-val="dashboard" onclick="bldToggleChip(this,'share')">🖥️ Dashboard</div>
+          <div class="chip" data-val="email" onclick="bldToggleChip(this,'share')">✉️ Email</div>
+          <div class="chip" data-val="slack" onclick="bldToggleChip(this,'share')">💬 Slack</div>
+          <div class="chip" data-val="whatsapp" onclick="bldToggleChip(this,'share')">📱 WhatsApp</div>
+          <div class="chip" data-val="gsheets" onclick="bldToggleChip(this,'share')">📗 Google Sheets</div>
+          <div class="chip" data-val="download" onclick="bldToggleChip(this,'share')">⬇️ Download</div>
+        </div>
+      </div>
+
+    </div><!-- end bld-body -->
+    <div class="bld-ftr">
+      <div class="bld-step-counter" id="bld-counter">Step 1 of 5</div>
+      <button class="btn btn-ink btn-sm" id="bld-back-btn" onclick="bldBack()" style="display:none">← Back</button>
+      <button class="btn btn-volt btn-sm" id="bld-next-btn" onclick="bldNext()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TEMPLATE LIBRARY PANEL ═══════════════════ -->
+<div class="tlib-overlay" id="tlib-overlay" onclick="if(event.target===this)closeTlib()">
+  <div class="tlib-panel">
+    <div class="tlib-hdr">
+      <div class="tlib-hdr-row">
+        <div class="tlib-title">📚 Agent Templates</div>
+        <button class="bld-close" onclick="closeTlib()">✕</button>
+      </div>
+      <input class="tlib-search" id="tlib-search" placeholder="Search templates…" oninput="renderTlib()">
+      <div class="tlib-cats" id="tlib-cats">
+        <div class="tlib-cat active" data-cat="all" onclick="setTlibCat(this,'all')">All</div>
+        <div class="tlib-cat" data-cat="finance" onclick="setTlibCat(this,'finance')">💰 Finance</div>
+        <div class="tlib-cat" data-cat="sales" onclick="setTlibCat(this,'sales')">📈 Sales & CRM</div>
+        <div class="tlib-cat" data-cat="ops" onclick="setTlibCat(this,'ops')">📦 Operations</div>
+        <div class="tlib-cat" data-cat="hr" onclick="setTlibCat(this,'hr')">👥 HR</div>
+        <div class="tlib-cat" data-cat="marketing" onclick="setTlibCat(this,'marketing')">🎯 Marketing</div>
+      </div>
+    </div>
+    <div class="tlib-body" id="tlib-body"></div>
+  </div>
+</div>
+
 </body>
 </html>
