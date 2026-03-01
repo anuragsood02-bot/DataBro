@@ -1,10 +1,16 @@
-fastapi==0.111.0
-uvicorn[standard]==0.29.0
-anthropic==0.28.0
-pandas==2.2.2
-openpyxl==3.1.2
+# FastAPI + core
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
 python-multipart==0.0.9
+
+# Data processing (PRE-COMPILED wheels)
+pandas==2.1.4
+openpyxl==3.1.5
+
+# Auth (optional, remove if unused)
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 aiofiles==23.2.1
-pydantic==2.7.1
+
+# AI (optional for demo - disable temporarily)
+# anthropic==0.28.0
