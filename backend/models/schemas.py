@@ -174,18 +174,41 @@ class RunResponse(BaseModel):
 # ── Custom agents ─────────────────────────────────────────────────────────────
 
 class CustomAgentCreate(BaseModel):
+    # Step 1 — Identity
     name: str
     description: str = ""
     icon: str = "✦"
     color: str = "#b8ff57"
-    sources: List[str] = ["csv"]
-    clean: List[str] = []
+
+    # Step 2 — Data sources
+    sources: List[str] = ["csv"]          # source type ids: csv, gsheet, sharepoint, etc.
+    file_descriptions: List[str] = []     # user descriptions of each file / what it contains
+    clean: List[str] = []                 # cleaning options: dedup, nulls, types, trim, std
+
+    # Step 2b — File understanding (column metadata)
+    column_metadata: str = ""             # plain-English column definitions & hints
+    # "which column means what, which to focus on" — fed to system prompt
+
+    # Step 3 — Business rules & SOPs
+    business_rules: List[str] = []        # threshold / flag rules in plain language
+    sops: List[str] = []                  # standard operating procedures in plain language
+    understanding_notes: str = ""         # any additional data understanding notes
+
+    # Step 4 — Actions
     actions: List[str] = ["analyse"]
-    outputs: List[str] = ["table"]
+    action_parameters: str = ""           # specific params e.g. "Correlate Revenue vs Target"
+    action_business_rules: List[str] = [] # action-step specific business rules / SOPs
+    action_extra: str = ""                # additional instructions for actions step
+
+    # Step 5 — Output
+    outputs: List[str] = ["table"]        # table, chart, pdf, csv, email, chat
+    infographic_style: List[str] = ["auto"]
+    infographic_notes: str = ""           # user notes — infographics built from OUTPUT not input
     share_destinations: List[str] = ["dashboard"]
-    infographic_style: List[str] = ["custom"]
-    extra_instructions: str = ""
-    params: Dict[str, List[str]] = {}
+    extra_instructions: str = ""          # catch-all extra instructions
+
+    # Internal
+    params: Dict[str, List[str]] = {}     # legacy — kept for backwards compat
 
 
 # ── Health ────────────────────────────────────────────────────────────────────
