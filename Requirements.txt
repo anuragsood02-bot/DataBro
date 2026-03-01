@@ -1,15 +1,21 @@
-# DataBro Production Requirements (Python 3.14.3 ✅)
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
-python-multipart==0.0.9
+# DataBro Production - Python 3.14.3 SAFE WHEELS ONLY
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
 
-# ✅ Python 3.14.3 Compatible Pandas
-pandas==2.3.3
-openpyxl==3.1.5
+# Python 3.14 SAFE - Pure Python wheels
+pandas==2.1.4
+pydantic==2.5.3
+typing_extensions==4.8.0
+annotated_types==0.6.0
 
-# Full features
-anthropic==0.28.0
+# File handling
+openpyxl==3.1.2
 aiofiles==23.2.1
-python-jose[cryptography]==3.3.0
+
+# Auth (pure Python)
+python-jose==3.3.0
 passlib[bcrypt]==1.7.4
-pydantic==2.7.4
+
+# AI (pure Python)
+anthropic==0.25.1
