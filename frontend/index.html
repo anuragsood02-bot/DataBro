@@ -707,31 +707,17 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
   </div>
 </div>
 
-<!-- API Key Modal -->
+<!-- Server Status Modal -->
 <div class="modal-ov" id="api-modal" style="display:none" onclick="if(event.target===this)closeApiModal()">
   <div class="modal">
-    <div class="modal-title">🔑 Claude AI Setup</div>
-    <div class="modal-sub">Add your Anthropic API key to unlock real AI responses. The key is called <strong>directly from your browser</strong> — no backend server needed.</div>
-    <div class="fg">
-      <label class="fl">Anthropic API Key</label>
-      <input type="password" class="fi" id="api-key-in" placeholder="sk-ant-api03-...">
-      <div style="font-size:.65rem;color:var(--fog);margin-top:5px;line-height:1.5">
-        🔒 Stored in memory only — never sent to any server except Anthropic.<br>
-        Get a free key at <strong style="color:var(--volt)">console.anthropic.com</strong> → API Keys
-      </div>
-    </div>
-    <div style="background:rgba(184,255,87,.05);border:1px solid rgba(184,255,87,.15);border-radius:9px;padding:11px;font-size:.72rem;color:var(--mist);margin:10px 0">
-      <strong style="color:var(--volt)">Without key:</strong> Demo mode — local analysis, smart replies<br>
-      <strong style="color:var(--volt)">With key:</strong> Real Claude AI chat + AI-powered output generation
-    </div>
-    <div class="fg" style="margin-top:4px">
-      <label class="fl">Backend URL (optional — only if running main.py)</label>
-      <input type="text" class="fi" id="api-backend-in" placeholder="http://localhost:8000">
-      <div style="font-size:.65rem;color:var(--fog);margin-top:4px">Leave empty if you're not running the Python backend. Everything works without it.</div>
+    <div class="modal-title">⚡ Server Status</div>
+    <div class="modal-sub">DataBro is running on your server — Claude AI is handled server-side. No API key needed here.</div>
+    <div id="api-status-box" style="background:rgba(184,255,87,.05);border:1px solid rgba(184,255,87,.15);border-radius:9px;padding:14px;font-size:.76rem;color:var(--mist);margin:10px 0;line-height:1.8">
+      Checking server…
     </div>
     <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn btn-volt" onclick="saveApiConfig()">Save & Activate</button>
-      <button class="btn btn-ink" onclick="closeApiModal()">Cancel</button>
+      <button class="btn btn-volt" onclick="closeApiModal()">Got it</button>
+      <button class="btn btn-ink" onclick="checkServerStatus()">↻ Refresh</button>
     </div>
   </div>
 </div>
@@ -874,21 +860,52 @@ window.switchAuthTab = function(t) {
   document.getElementById('aform-reg').style.display = t === 'register' ? '' : 'none';
 };
 
-window.requestMagicLink = function() {
+window.requestMagicLink = async function() {
   const email = document.getElementById('login-email').value.trim();
   if (!email || !email.includes('@')) { toast('⚠️ Enter a valid email address'); return; }
   const btn = document.getElementById('magic-btn');
   btn.innerHTML = '<div class="loader"></div> Sending...';
   btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
-  S.user = { email, name: email.split('@')[0], initials: email[0].toUpperCase() };
-  // Try backend silently — NEVER block the UI
-  tryBackend('/auth/magic-link', { method:'POST', body:JSON.stringify({email}) });
-  setTimeout(() => {
-    btn.style.display = 'none';
-    document.getElementById('magic-sent').style.display = '';
-    document.getElementById('magic-email-disp').textContent = email;
-  }, 800);
+  S.pendingEmail = email;
+  S.user = { email, name: email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()), initials: email[0].toUpperCase() };
+
+  try {
+    const r = await tryBackend('/auth/magic-link', { method:'POST', body:JSON.stringify({email}) });
+    // In dev mode backend returns dev_token — auto-login immediately
+    if (r?.dev_token) {
+      const vr = await tryBackend('/auth/verify', { method:'POST', body:JSON.stringify({token: r.dev_token}) });
+      if (vr?.token) {
+        S.sessionToken = vr.token;
+        if (vr.user) S.user = { ...S.user, ...vr.user, initials: (vr.user.name||email)[0].toUpperCase() };
+        loginSuccess(); return;
+      }
+    }
+  } catch(e) {}
+
+  // Production: show "check inbox" and wait for user to click link
+  btn.style.display = 'none';
+  document.getElementById('magic-sent').style.display = '';
+  document.getElementById('magic-email-disp').textContent = email;
+  // Check URL for token (user clicked email link)
+  checkUrlToken();
 };
+
+function checkUrlToken() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (!token) return;
+  tryBackend('/auth/verify', { method:'POST', body:JSON.stringify({token}) }).then(r => {
+    if (r?.token) {
+      S.sessionToken = r.token;
+      if (r.user) S.user = { email: r.user.email, name: r.user.name, initials: r.user.name[0].toUpperCase(), ...r.user };
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      loginSuccess();
+    }
+  });
+}
+// Auto-check on page load in case user clicked magic link
+document.addEventListener('DOMContentLoaded', checkUrlToken);
 
 window.simulateLogin = function() { loginSuccess(); };
 
@@ -915,9 +932,10 @@ function loginSuccess() {
   document.getElementById('dash-uname').textContent = S.user.email;
   document.getElementById('dash-uav').textContent = S.user.initials;
   document.getElementById('dash-greet').textContent = S.user.name.split(' ')[0];
-  updateApiUI();
   window.goPage('page-dashboard');
   toast(`✅ Welcome, ${S.user.name.split(' ')[0]}!`);
+  // Silently check server status and update header dots
+  setTimeout(checkServerStatus, 500);
 }
 
 // ── OPEN AGENT ─────────────────────────────────────────
@@ -1343,6 +1361,20 @@ window.generateOutput = async function() {
   const el = document.getElementById('output-content');
   if(el) el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;color:var(--mist);font-size:.8rem;padding:40px;justify-content:center"><div class="loader"></div> Generating output…</div>`;
 
+  // Always try backend first (API key is on the server)
+  try {
+    const dsIds = dsa.map(d=>d.id).filter(Boolean);
+    const r = await tryBackend('/agent/run', {
+      method:'POST',
+      body: JSON.stringify({ agent_id: S.currentAgent, dataset_ids: dsIds, task:'full_analysis' })
+    });
+    if (r?.result) {
+      renderStructuredOutput(r.result);
+      addMsg('ai', `⚡ AI analysis complete!<br><br>${r.result.summary || 'Output generated successfully.'}`);
+      return;
+    }
+  } catch(e) {}
+  // Fallback: direct browser call if backend unavailable
   if (S.apiKey) {
     try {
       const result = await runClaudeAnalysis(dsa);
@@ -1350,8 +1382,7 @@ window.generateOutput = async function() {
       addMsg('ai', `⚡ AI analysis complete!<br><br>${result.summary || 'Output generated successfully.'}`);
       return;
     } catch(e) {
-      const msg = e.message.includes('401') ? 'Invalid API key — check your key.' : e.message.includes('fetch') ? 'Network error contacting Anthropic.' : e.message;
-      toast('⚠️ Claude AI: ' + msg + ' — showing local analysis');
+      toast('⚠️ AI error — showing local analysis');
     }
   }
   // Local analysis — always works, no API needed
@@ -1580,7 +1611,23 @@ window.sendMsg = async function() {
   chatHistory.push({role:'user',content:text});
   if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
   try{
-    if(S.apiKey){
+    // Try backend first — API key lives on the server
+    const dsIds = Object.values(S.datasets).filter(d=>d.data?.length).map(d=>d.id).filter(Boolean);
+    const backendReply = await tryBackend('/agent/chat', {
+      method:'POST',
+      body: JSON.stringify({
+        agent_id: S.currentAgent,
+        message: text,
+        history: chatHistory.slice(-20).map(m=>({role:m.role,content:m.content})),
+        dataset_ids: dsIds,
+        stream: false
+      })
+    });
+    if (backendReply?.reply) {
+      chatHistory.push({role:'assistant', content:backendReply.reply});
+      addMsg('ai', fmtMd(backendReply.reply));
+    } else if(S.apiKey){
+      // Fallback: direct browser call
       const A=AGENTS[S.currentAgent], cfg=S.agentConfigs[S.currentAgent]||{};
       const sys=(cfg.system_prompt||A.defaultPrompt)+(cfg.extra_instructions?'\n\nEXTRA INSTRUCTIONS:\n'+cfg.extra_instructions:'')+buildLocalContext();
       const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -1708,7 +1755,36 @@ window.switchTab = function(name){
 window.switchTabW = window.switchTab;
 
 // ── API CONFIG ─────────────────────────────────────────
-window.openApiModal = function(){ showHide('api-modal', true); };
+window.openApiModal = function(){
+  showHide('api-modal', true);
+  checkServerStatus();
+};
+
+window.checkServerStatus = async function() {
+  const box = document.getElementById('api-status-box'); if(!box) return;
+  box.innerHTML = '<div class="loader" style="display:inline-block;margin-right:8px"></div> Checking server…';
+  try {
+    const r = await fetch(BACKEND_URL + '/health');
+    const d = await r.json();
+    const apiOk = d.api_key_set;
+    box.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:9px;height:9px;border-radius:50%;background:${apiOk?'var(--emerald)':'var(--amber)'}"></div>
+        <strong style="color:#fff">Server: ${d.status === 'ok' ? 'Online' : 'Issues detected'}</strong>
+      </div>
+      <div>Claude API key: <strong style="color:${apiOk?'var(--emerald)':'var(--rose)'}">${apiOk ? '✓ Connected — AI is live' : '⚠️ Not set — go to Render → Environment → add ANTHROPIC_API_KEY'}</strong></div>
+      <div style="margin-top:4px">Active sessions: ${d.active_sessions} · Datasets loaded: ${d.datasets_in_memory}</div>
+      <div style="margin-top:4px;font-size:.65rem;color:var(--fog)">Version ${d.version} · ${new Date().toLocaleTimeString()}</div>
+    `;
+    // Update header dots
+    const live = apiOk;
+    ['dash-sdot','agent-sdot','chat-dot'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.background=live?'var(--emerald)':'var(--amber)';}});
+    ['dash-api-lbl','agent-api-lbl'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=live?'Claude AI Active':'Demo Mode';});
+    const cs=document.getElementById('chat-st');if(cs)cs.textContent=live?'Claude AI Active · server-side':'Demo mode';
+  } catch(e) {
+    box.innerHTML = '<span style="color:var(--rose)">⚠️ Cannot reach server — check your Render deployment.</span>';
+  }
+};
 window.closeApiModal = function(){ showHide('api-modal', false); };
 
 window.saveApiConfig = function(){
