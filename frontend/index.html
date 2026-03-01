@@ -456,17 +456,17 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
         </div>
         <div id="aform-login">
           <div class="auth-title">Welcome back</div>
-          <div class="auth-sub2">Enter your email — we'll send a magic login link.</div>
+          <div class="auth-sub2">Enter your email — we'll send a secure magic link to log you in.</div>
           <div class="fg"><label class="fl">Email Address</label><input class="fi" type="email" id="login-email" placeholder="you@company.com" onkeydown="if(event.key==='Enter')requestMagicLink()"></div>
           <button class="btn btn-volt btn-full btn-lg" id="magic-btn" onclick="requestMagicLink()">✉️ Send Magic Link</button>
           <div id="magic-sent" style="display:none">
-            <div class="magic-box"><div class="mb-icon">📬</div><div class="mb-title">Check your inbox!</div>
-            <div class="mb-text">Secure link sent to<br><span class="mb-email" id="magic-email-disp"></span></div>
-            <button class="btn btn-ink btn-sm btn-full" style="margin-top:11px" onclick="simulateLogin()">🔓 Simulate email click (dev)</button></div>
+            <div class="magic-box">
+              <div class="mb-icon">📬</div>
+              <div class="mb-title">Check your inbox!</div>
+              <div class="mb-text">Magic link sent to<br><strong><span class="mb-email" id="magic-email-disp"></span></strong><br><span style="font-size:.72rem;color:var(--fog)">Click the link in the email to log in. Link expires in 15 minutes.</span></div>
+            </div>
           </div>
-          <div class="fdiv"><div class="fdiv-line"></div><div class="fdiv-t">or</div><div class="fdiv-line"></div></div>
-          <button class="btn btn-ink btn-full" onclick="demoLogin()">👀 Try Demo (no account)</button>
-          <div class="fhelper">No account? <a href="#" onclick="switchAuthTab('register')">Create one free →</a></div>
+          <div class="fhelper" style="margin-top:14px">No account? <a href="#" onclick="switchAuthTab('register')">Create one free →</a></div>
         </div>
         <div id="aform-reg" style="display:none">
           <div class="auth-title">Create account</div>
@@ -475,8 +475,8 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
           <div class="fg"><label class="fl">Work Email</label><input class="fi" type="email" id="reg-email" placeholder="jane@company.com"></div>
           <div class="fg"><label class="fl">Company</label><input class="fi" type="text" id="reg-company" placeholder="Acme Corp"></div>
           <div class="fg"><label class="fl">Industry</label><select class="fi" id="reg-industry"><option value="">Select...</option><option>Manufacturing</option><option>Retail</option><option>Healthcare</option><option>Professional Services</option><option>Construction</option><option>FMCG</option><option>Other</option></select></div>
-          <button class="btn btn-volt btn-full btn-lg" onclick="registerUser()">🚀 Create Account & Get Magic Link</button>
-          <div class="fhelper">Already have one? <a href="#" onclick="switchAuthTab('login')">Sign in →</a></div>
+          <button class="btn btn-volt btn-full btn-lg" onclick="registerUser()">🚀 Create Account</button>
+          <div class="fhelper" style="margin-top:14px">Already have one? <a href="#" onclick="switchAuthTab('login')">Sign in →</a></div>
         </div>
       </div>
     </div>
@@ -489,7 +489,7 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
     <header class="dash-hdr">
       <div class="logo"><div class="logo-icon" style="width:28px;height:28px;font-size:.85rem">DB</div><div class="logo-name" style="font-size:1.05rem">DataBro</div></div>
       <div style="flex:1"></div>
-      <div class="api-pill" onclick="openApiModal()"><div class="sdot" id="dash-sdot"></div><span id="dash-api-lbl">Demo Mode</span></div>
+      <div class="api-pill" onclick="openApiModal()"><div class="sdot" id="dash-sdot"></div><span id="dash-api-lbl">⚡ AI Status</span></div>
       <div class="user-pill" onclick="logout()"><div class="uav" id="dash-uav">D</div><span class="uname" id="dash-uname">demo@databro.ai</span></div>
     </header>
     <div class="dash-body">
@@ -538,7 +538,7 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
       <div><div style="font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;font-weight:800;color:#fff" id="tb-name">Sales Planner</div><div style="font-family:'JetBrains Mono',monospace;font-size:.54rem;color:var(--fog)" id="tb-role">SALES_TERRITORY_AGENT</div></div>
       <div style="flex:1"></div>
       <button class="btn btn-ink btn-sm" onclick="openCustomiser()" style="gap:5px">⚙️ Customise Agent</button>
-      <div class="api-pill" onclick="openApiModal()"><div class="sdot" id="agent-sdot"></div><span id="agent-api-lbl">Demo Mode</span></div>
+      <div class="api-pill" onclick="openApiModal()"><div class="sdot" id="agent-sdot"></div><span id="agent-api-lbl">⚡ AI Status</span></div>
       <div class="user-pill" onclick="logout()"><div class="uav" id="agent-uav">D</div></div>
     </div>
 
@@ -620,7 +620,7 @@ code.ic{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:rgba(
         <div class="msgs" id="msgs"></div>
         <div class="suggs" id="suggs"></div>
         <div class="chat-in-wrap">
-          <div class="chat-status"><div class="sdot" id="chat-dot"></div><span id="chat-st">Demo mode</span></div>
+          <div class="chat-status"><div class="sdot" id="chat-dot"></div><span id="chat-st">Connecting…</span></div>
           <div class="chat-row">
             <textarea class="chat-in" id="chat-in" placeholder="Ask your agent..." rows="1"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
@@ -742,7 +742,7 @@ const BACKEND_URL = window.location.hostname === 'localhost' || window.location.
 const S = {
   user: null,
   apiKey: '',
-  backendUrl: '',           // empty = no backend attempts
+  backendUrl: BACKEND_URL,   // always use the server
   sessionToken: '',
   currentAgent: 'sales',
   datasets: {},
@@ -759,16 +759,23 @@ const AGENTS = {
     sub:"Upload rep sales files + customer database. I'll compile plans by rep, state, city, and region.",
     steps:['Upload rep sales CSV','Upload customer database','Click ⚡ Generate Output'],
     suggs:['Show sales by region','Top performing rep?','Map customers to states','City-wise breakdown','Which territory is uncovered?'],
-    defaultPrompt:`You are the Sales Planner agent for DataBro. The FULL dataset rows are injected into every message — you have complete access to all the data. NEVER ask the user to paste data, describe columns, or provide sample rows. Always compute answers directly from the data provided to you.
+    defaultPrompt:`You are the Sales Planner agent for DataBro. The FULL dataset rows are provided to you — you have complete access to every row of data. NEVER ask the user to paste data or describe their files.
 
-Your role: Compile and analyse sales plans from ground-level reps.
-Tasks:
-- Compile sales totals by rep name, state, city, region, and customer segment using the actual column values
-- Identify top performers, geographic concentration, uncovered territories
-- Flag mismatches between rep submissions and the customer database
-- Answer any question about the data immediately with specific numbers and names from the rows
+CRITICAL — COLUMN IDENTIFICATION RULES (do this first, silently, before answering):
+1. Scan the column names in the uploaded files.
+2. Identify the REP column: look for columns named like "Rep Name", "Sales Rep", "Salesperson", "Employee", "Agent", "Rep" — this is the PERSON making the sale.
+3. Identify the CUSTOMER column: look for columns named like "Customer", "Client", "Account", "Company", "Customer Name", "Dealer" — this is the PERSON/COMPANY being sold to.
+4. NEVER swap these. If a user asks "who is the top rep" — answer from the REP column. If they ask "which customers" — answer from the CUSTOMER column.
+5. If column names are ambiguous, state your assumption clearly: "I am treating [column X] as the rep name because..."
 
-Output style: Lead with a markdown table of results, then 3 numbered insights with exact figures.`
+Your tasks:
+- Compile sales totals grouped by: rep name, region/state/city (whichever geography columns exist), and customer
+- Rank reps by total sales value — name the top 3 and bottom 3 with exact figures
+- Identify which customers generated the most revenue and for which reps
+- Flag any territory gaps (reps with very few customers or low coverage)
+- Answer every question with exact numbers, names, and row counts from the data
+
+Output format: Always start with a summary table, then numbered insights with specific figures.`
   },
   finance: {
     name:'Finance Guardian', role:'FINANCIAL_ANALYSIS_AGENT', icon:'🛡️',
@@ -864,30 +871,21 @@ window.requestMagicLink = async function() {
   const email = document.getElementById('login-email').value.trim();
   if (!email || !email.includes('@')) { toast('⚠️ Enter a valid email address'); return; }
   const btn = document.getElementById('magic-btn');
-  btn.innerHTML = '<div class="loader"></div> Sending...';
+  btn.innerHTML = '<div class="loader"></div> Sending…';
   btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
   S.pendingEmail = email;
   S.user = { email, name: email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()), initials: email[0].toUpperCase() };
-
-  try {
-    const r = await tryBackend('/auth/magic-link', { method:'POST', body:JSON.stringify({email}) });
-    // In dev mode backend returns dev_token — auto-login immediately
-    if (r?.dev_token) {
-      const vr = await tryBackend('/auth/verify', { method:'POST', body:JSON.stringify({token: r.dev_token}) });
-      if (vr?.token) {
-        S.sessionToken = vr.token;
-        if (vr.user) S.user = { ...S.user, ...vr.user, initials: (vr.user.name||email)[0].toUpperCase() };
-        loginSuccess(); return;
-      }
-    }
-  } catch(e) {}
-
-  // Production: show "check inbox" and wait for user to click link
-  btn.style.display = 'none';
-  document.getElementById('magic-sent').style.display = '';
-  document.getElementById('magic-email-disp').textContent = email;
-  // Check URL for token (user clicked email link)
-  checkUrlToken();
+  const r = await tryBackend('/auth/magic-link', { method:'POST', body:JSON.stringify({email}) });
+  if (r) {
+    btn.style.display = 'none';
+    document.getElementById('magic-sent').style.display = '';
+    document.getElementById('magic-email-disp').textContent = email;
+    toast('📬 Magic link sent to ' + email);
+  } else {
+    btn.innerHTML = '✉️ Send Magic Link';
+    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+    toast('⚠️ Could not reach server — check your connection');
+  }
 };
 
 function checkUrlToken() {
@@ -907,25 +905,39 @@ function checkUrlToken() {
 // Auto-check on page load in case user clicked magic link
 document.addEventListener('DOMContentLoaded', checkUrlToken);
 
-window.simulateLogin = function() { loginSuccess(); };
+// simulateLogin removed
 
-window.demoLogin = function() {
-  S.user = { email:'demo@databro.ai', name:'Demo User', initials:'D' };
-  tryBackend('/auth/demo', { method:'POST' }).then(r => { if (r?.token) S.sessionToken = r.token; });
-  loginSuccess();
-};
+// demoLogin removed — users must authenticate via magic link
 
-window.registerUser = function() {
+window.registerUser = async function() {
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
-  if (!name || !email) { toast('⚠️ Fill in name and email'); return; }
-  S.user = { email, name, initials: name[0].toUpperCase() };
-  tryBackend('/auth/register', {
-    method:'POST',
-    body: JSON.stringify({ email, name, company: document.getElementById('reg-company').value, industry: document.getElementById('reg-industry').value })
-  }).then(r => { if (r?.token) S.sessionToken = r.token; });
-  toast('✅ Account created!');
-  setTimeout(loginSuccess, 300);
+  if (!name) { toast('⚠️ Enter your name'); return; }
+  if (!email || !email.includes('@')) { toast('⚠️ Enter a valid email'); return; }
+  const btn = document.querySelector('#aform-reg .btn-volt');
+  if (btn) { btn.innerHTML = '<div class="loader"></div> Creating account…'; btn.style.opacity='0.6'; btn.style.pointerEvents='none'; }
+  // Register on backend
+  const r = await tryBackend('/auth/register', {
+    method:'POST', noJson:true,
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({ email, name, company: document.getElementById('reg-company').value||'', industry: document.getElementById('reg-industry').value||'' })
+  });
+  if (r?.token) {
+    // Registration succeeded — send magic link so they verify email
+    S.pendingEmail = email;
+    S.pendingName = name;
+    await tryBackend('/auth/magic-link', { method:'POST', body:JSON.stringify({email}) });
+    if (btn) { btn.innerHTML = '📬 Magic link sent!'; btn.style.opacity='1'; }
+    // Show the magic-sent state on login tab
+    switchAuthTab('login');
+    document.getElementById('magic-btn').style.display = 'none';
+    document.getElementById('magic-sent').style.display = '';
+    document.getElementById('magic-email-disp').textContent = email;
+    toast('✅ Account created! Check your email for the login link.');
+  } else {
+    if (btn) { btn.innerHTML = '🚀 Create Account'; btn.style.opacity='1'; btn.style.pointerEvents='auto'; }
+    toast('⚠️ Could not create account — check server connection');
+  }
 };
 
 function loginSuccess() {
@@ -1788,16 +1800,7 @@ window.checkServerStatus = async function() {
 window.closeApiModal = function(){ showHide('api-modal', false); };
 
 window.saveApiConfig = function(){
-  S.apiKey = document.getElementById('api-key-in')?.value.trim() || '';
-  const buVal = document.getElementById('api-backend-in')?.value.trim();
-  if(buVal) S.backendUrl = buVal;
-  updateApiUI(); window.closeApiModal();
-  if(S.apiKey){
-    toast('✅ Claude AI key saved — real AI now active for chat and output');
-    tryBackend('/auth/demo',{method:'POST'}).then(r=>{if(r?.token)S.sessionToken=r.token;});
-  } else {
-    toast('ℹ️ Running in Demo Mode — add API key for real Claude AI');
-  }
+  closeApiModal();
 };
 
 function updateApiUI(){
@@ -1810,7 +1813,7 @@ function updateApiUI(){
 
 // ── BACKEND HELPERS ────────────────────────────────────
 async function apiFetch(path, opts={}){
-  const url=(S.backendUrl||'http://localhost:8000')+path;
+  const url=BACKEND_URL+path;
   const headers={...(opts.headers||{})};
   if(!opts.noJson) headers['Content-Type']='application/json';
   if(S.sessionToken) headers['Authorization']='Bearer '+S.sessionToken;
@@ -1820,9 +1823,8 @@ async function apiFetch(path, opts={}){
 }
 // tryBackend — NEVER throws; returns null on any failure
 async function tryBackend(path, opts={}){
-  if(!S.backendUrl&&!path.startsWith('http')) return null;
   try{ return await apiFetch(path,opts); }
-  catch(e){ return null; }
+  catch(e){ console.warn('tryBackend failed:', path, e.message); return null; }
 }
 
 // ── MISC ───────────────────────────────────────────────
