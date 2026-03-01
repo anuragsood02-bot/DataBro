@@ -16,7 +16,7 @@ pip install -r requirements.txt
 #    Option A: Export in terminal (lasts until terminal closes)
 export ANTHROPIC_API_KEY="sk-ant-YOUR_KEY_HERE"
 #    Option B: Create a .env file (safer for dev)
-#    echo 'ANTHROPIC_API_KEY=sk-ant-YOUR_KEY_HERE' > .env
+#    echo 'ANTHROPIC_API_KEY=sk-ant-YOUR_KEY_H' > .env
 
 # 4. Start the server
 echo "Starting DataBro backend on http://localhost:8000 ..."
