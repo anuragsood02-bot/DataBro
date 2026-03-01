@@ -1,0 +1,44 @@
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+*.pem
+*.key
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.Python
+.venv/
+venv/
+env/
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# ── Data / uploads ────────────────────────────────────────────────────────────
+backend/uploads/
+backend/sessions/
+backend/agent_configs/
+*.csv
+*.xlsx
+*.xls
+*.json.bak
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ── Node (if frontend tooling added later) ────────────────────────────────────
+node_modules/
+.npm/
