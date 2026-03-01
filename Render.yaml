@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: databro-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false          # paste manually in Render dashboard
+      - key: SECRET_KEY
+        generateValue: true  # Render auto-generates a secure random value
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ENVIRONMENT
+        value: production
+    healthCheckPath: /health
+    autoDeploy: true         # redeploy on every git push
