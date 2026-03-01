@@ -14,7 +14,8 @@ from typing import Optional, List, Dict, Any
 
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Form, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from core.config import settings
 from core.auth import (
@@ -437,11 +438,10 @@ async def health():
 
 @app.get("/", tags=["System"])
 async def root():
-    return {
-        "message": "DataBro API v2",
-        "docs": "/docs",
-        "health": "/health",
-    }
+    frontend = Path("../frontend/index.html")
+    if frontend.exists():
+        return FileResponse(frontend)
+    return {"message": "DataBro API v2", "docs": "/docs", "health": "/health"}
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
