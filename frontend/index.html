@@ -875,16 +875,28 @@ window.requestMagicLink = async function() {
   btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
   S.pendingEmail = email;
   S.user = { email, name: email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()), initials: email[0].toUpperCase() };
-  const r = await tryBackend('/auth/magic-link', { method:'POST', body:JSON.stringify({email}) });
-  if (r) {
-    btn.style.display = 'none';
-    document.getElementById('magic-sent').style.display = '';
-    document.getElementById('magic-email-disp').textContent = email;
-    toast('📬 Magic link sent to ' + email);
-  } else {
+  try {
+    const res = await fetch(BACKEND_URL + '/auth/magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      btn.style.display = 'none';
+      document.getElementById('magic-sent').style.display = '';
+      document.getElementById('magic-email-disp').textContent = email;
+    } else {
+      // Show the actual server error so user knows what's wrong
+      const msg = data.detail || data.message || 'Unknown error';
+      btn.innerHTML = '✉️ Send Magic Link';
+      btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+      toast('⚠️ ' + msg);
+    }
+  } catch(e) {
     btn.innerHTML = '✉️ Send Magic Link';
     btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
-    toast('⚠️ Could not reach server — check your connection');
+    toast('⚠️ Cannot reach server. Is your Render app running?');
   }
 };
 
