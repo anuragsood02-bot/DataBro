@@ -8,7 +8,6 @@ Run locally:   uvicorn main:app --reload
 Run on Render: set startCommand = uvicorn main:app --host 0.0.0.0 --port $PORT
 """
 import os, json, uuid, io
-import httpx
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -20,11 +19,10 @@ from fastapi.staticfiles import StaticFiles
 
 from core.config import settings
 from core.auth import (
-    create_session, create_magic_token, consume_magic_token,
-    get_current_user, invalidate_session, active_session_count, SESSIONS
+    create_session, get_current_user, invalidate_session, active_session_count, SESSIONS
 )
 from models.schemas import (
-    MagicLinkRequest, VerifyTokenRequest, RegisterRequest,
+    MagicLinkRequest, RegisterRequest,
     ChatRequest, AnalysisRequest, CorrelateRequest, AgentConfig, CustomAgentCreate
 )
 from services.file_service import (
@@ -101,69 +99,11 @@ Output: Schema summary table → exact discrepancy list → quality scorecard.""
 
 # ── Auth routes ───────────────────────────────────────────────────────────────
 
-@app.post("/auth/magic-link", tags=["Auth"])
-async def send_magic_link(req: MagicLinkRequest):
-    """Generate magic link token and email it via Resend."""
-    token = create_magic_token(req.email)
-    magic_url = f"{settings.app_url}?token={token}"
-
-    email_sent = False
-    error_msg = ""
-
-    resend_key = os.getenv("RESEND_API_KEY", "")
-    from_email = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
-    app_name   = os.getenv("APP_NAME", "DataBro")
-
-    if resend_key:
-        html_body = f"""
-        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-          <div style="font-size:1.5rem;font-weight:900;margin-bottom:8px">🔐 {app_name}</div>
-          <p style="color:#555;margin-bottom:24px">Click the button below to log in. This link expires in <strong>15 minutes</strong>.</p>
-          <a href="{magic_url}"
-             style="display:inline-block;background:#b8ff57;color:#000;font-weight:700;padding:14px 28px;border-radius:8px;text-decoration:none;font-size:1rem">
-            Log in to {app_name} →
-          </a>
-          <p style="color:#999;font-size:.8rem;margin-top:28px">
-            If you didn't request this, you can safely ignore it.<br>
-            Link: <a href="{magic_url}" style="color:#999">{magic_url}</a>
-          </p>
-        </div>"""
-
-        try:
-            async with httpx.AsyncClient(timeout=10) as client:
-                resp = await client.post(
-                    "https://api.resend.com/emails",
-                    headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
-                    json={
-                        "from": f"{app_name} <{from_email}>",
-                        "to": [req.email],
-                        "subject": f"Your {app_name} login link",
-                        "html": html_body,
-                    }
-                )
-                if resp.status_code in (200, 201):
-                    email_sent = True
-                else:
-                    error_msg = resp.text
-        except Exception as e:
-            error_msg = str(e)
-    else:
-        error_msg = "RESEND_API_KEY not configured"
-
-    if not email_sent:
-        # Log clearly so it shows in Render logs
-        print(f"[EMAIL ERROR] Could not send to {req.email}: {error_msg}")
-        raise HTTPException(500, detail=f"Could not send magic link email: {error_msg}. Check RESEND_API_KEY in Render environment variables.")
-
-    return {"success": True, "message": f"Magic link sent to {req.email}"}
-
-
-@app.post("/auth/verify", tags=["Auth"])
-async def verify_magic_link(req: VerifyTokenRequest):
-    email = consume_magic_token(req.token)
-    if not email:
-        raise HTTPException(400, "Invalid or expired link. Please request a new one.")
-    token = create_session(email)
+@app.post("/auth/login", tags=["Auth"])
+async def login(req: MagicLinkRequest):
+    """Passwordless login — enter email, get a session immediately. No email verification for now."""
+    token = create_session(req.email)
+    USER_DATASETS.setdefault(SESSIONS[token]["user_id"], [])
     return {"token": token, "user": SESSIONS[token]}
 
 
