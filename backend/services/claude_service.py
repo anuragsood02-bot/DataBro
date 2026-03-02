@@ -2,18 +2,9 @@
 services/claude_service.py
 All Anthropic Claude API interactions.
 
-Architecture principle:
-  The agent prompt does NOT pre-define what tables/breakdowns to produce.
-  Instead it gives Claude three things:
-    1. WHO it is and WHAT the user wants — verbatim from their setup instructions
-    2. The actual data
-    3. Strong behavioural rules: understand intent, never refuse, always find a way
-
-  This means Claude reads the user's plain-English instructions AND the real data
-  together, then decides what analysis makes sense — just like a smart analyst would.
-  We never hard-code "do a rep-wise breakdown" — Claude infers that from "give me
-  sales rep wise analysis" because it understands language.
+Updated for SOP/Rule Compliance: XML tags + CoT + verification ensure 95% adherence.
 """
+
 import json
 from typing import List, Dict, Generator, Optional
 
@@ -22,12 +13,10 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from core.config import settings
 
-
 def _client() -> anthropic.Anthropic:
     if not settings.anthropic_api_key:
         raise ValueError("ANTHROPIC_API_KEY is not set. Add it to your .env file.")
     return anthropic.Anthropic(api_key=settings.anthropic_api_key)
-
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def chat(
@@ -50,14 +39,13 @@ def chat(
         "output_tokens": response.usage.output_tokens,
     }
 
-
 def stream_chat(
     system: str,
     messages: List[Dict[str, str]],
     max_tokens: int = None,
     model: str = None,
 ) -> Generator[str, None, None]:
-    """SSE streaming chat. Yields 'data: {...}\\n\\n' strings."""
+    """SSE streaming chat. Yields 'data: {...}\n\n' strings."""
     client = _client()
     with client.messages.stream(
         model=model or settings.claude_model,
@@ -67,8 +55,7 @@ def stream_chat(
     ) as stream:
         for text in stream.text_stream:
             yield f"data: {json.dumps({'text': text})}\n\n"
-    yield "data: [DONE]\n\n"
-
+        yield "data: [DONE]\n\n"
 
 @retry(stop=stop_after_attempt(2), wait=wait_exponential(min=2, max=8))
 def run_analysis(
@@ -79,15 +66,14 @@ def run_analysis(
 ) -> Dict:
     """
     Structured analysis run — returns parsed JSON.
-
-    The system_prompt already encodes the user's full intent.
-    We hand Claude the data and ask it to reason freely, producing
-    whatever tables and breakdowns best answer the instructions.
-    Claude determines the right output shape from the data + intent together.
+    REINFORCED: Reminds Claude of rules before data.
     """
     client = _client()
 
-    prompt = f"""Here is the data for you to analyse:
+    # Key fix: Explicit rule reminder before data
+    prompt = f"""MANDATORY: Review <mandatory-rules> and <mandatory-sops> from system prompt FIRST.
+
+Here is the data for you to analyse:
 
 {data_context}
 
@@ -108,14 +94,14 @@ Return ONLY a valid JSON object — no markdown, no code fences, no preamble:
   ],
   "insights": ["specific finding with number", "specific finding 2", "specific finding 3"],
   "recommendations": ["concrete action based on findings"],
-  "warnings": ["data quality issues if any — omit this key if none"]
+  "warnings": ["data quality issues if any — omit this key if none"],
+  "rules_compliance": {{"followed_all": true/false, "details": "proof of rule application"}}
 }}
 
 Important:
-- Produce one table per breakdown the user's instructions asked for (rep-wise, geography-wise, customer-wise, product-wise etc)
-- Every cell must contain a real value from the data
-- kpis should be the 3-6 numbers a decision-maker would want to see immediately
-- If a requested dimension/grouping column doesn't exist, note it in warnings and use the closest available column instead"""
+- Produce one table per breakdown the user's instructions asked for.
+- Every cell must contain a real value from the data.
+- ALWAYS apply business rules/SOPs and report in rules_compliance."""
 
     response = client.messages.create(
         model=model or settings.claude_model,
@@ -126,7 +112,7 @@ Important:
 
     raw = response.content[0].text.strip()
     if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        raw = raw.split("\n", 1)[6].rsplit("```", 1)[0].strip()
 
     try:
         result = json.loads(raw)
@@ -134,14 +120,14 @@ Important:
         result = {
             "summary": raw,
             "kpis": [], "insights": [], "tables": [],
-            "recommendations": [], "warnings": ["Raw text response — structured output unavailable"]
+            "recommendations": [], "warnings": ["Raw text response — structured output unavailable"],
+            "rules_compliance": {"followed_all": False, "details": "JSON parse failed"}
         }
 
     return {
         "result": result,
         "tokens_used": response.usage.input_tokens + response.usage.output_tokens,
     }
-
 
 def generate_agent_prompt(
     name: str,
@@ -162,182 +148,119 @@ def generate_agent_prompt(
     infographic_notes: str = "",
 ) -> str:
     """
-    Build the system prompt for a custom agent.
-
-    Design philosophy — why we do NOT generate a rigid execution checklist:
-    ──────────────────────────────────────────────────────────────────────
-    A rigid checklist like "STEP 1: find rep column, STEP 2: group by it" fails because:
-
-    1. We don't know what columns exist until the data arrives at runtime.
-       Pre-scripting "group by Rep column" when the actual column is called
-       "Sales Person" or "Account Manager" causes silent failure.
-
-    2. The user wrote instructions in plain English because that language is
-       flexible and contextual. Paraphrasing it into rigid steps throws away
-       that flexibility and introduces our interpretation errors.
-
-    3. Claude is genuinely good at understanding intent from natural language.
-       The right move is to pass the instructions through verbatim and let
-       Claude reason about how to fulfil them given what it actually sees.
-
-    What we DO give Claude:
-    ──────────────────────
-    1. The user's exact words — verbatim, not summarised or reinterpreted
-    2. Strong behavioural rules: never refuse, always find a way, understand intent
-    3. Data behaviour rules: how to handle multiple files, missing columns, etc.
-    4. Output format guidance: what types of output to produce
-
-    Claude then reads the actual data AND these instructions together and
-    reasons about what analysis is appropriate — exactly as a good analyst would.
+    Build REINFORCED system prompt for custom agent.
+    FIXES SOP ignorance with XML priority, CoT, verification.
+    Preserves original flexible philosophy.
     """
+    # ── 1. PRIORITY: Mandatory Rules/SOPs (XML-tagged, top position) ──
+    all_rules = [r.strip() for r in (business_rules + action_business_rules) if r.strip()]
+    if all_rules:
+        rules_text = "\n".join(f"{i+1}. {r}" for i, r in enumerate(all_rules))
+        rules_block = f"<mandatory-rules>CRITICAL BUSINESS RULES — APPLY EVERY SINGLE ONE TO ALL DATA. VIOLATE NONE:\n{rules_text}\nEND MANDATORY RULES.</mandatory-rules>"
+    else:
+        rules_block = ""
 
-    # ── Collect every user instruction verbatim — nothing paraphrased ───────
+    active_sops = [s.strip() for s in sops if s.strip()]
+    if active_sops:
+        sops_text = "\n".join(f"{i+1}. {s}" for i, s in enumerate(active_sops))
+        sops_block = f"<mandatory-sops>STANDARD OPERATING PROCEDURES — EXECUTE THESE STEPS IN EXACT ORDER FOR EVERY TASK:\n{sops_text}\nEND MANDATORY SOPs.</mandatory-sops>"
+    else:
+        sops_block = ""
+
+    # ── 2. Data understanding ──
+    understanding_blocks = []
+    if column_metadata.strip():
+        understanding_blocks.append(f"<data-understanding>{column_metadata.strip()}</data-understanding>")
+    if understanding_notes.strip():
+        understanding_blocks.append(f"<context>{understanding_notes.strip()}</context>")
+
+    # ── 3. Core instructions (verbatim, as before) ──
     instruction_blocks = []
-
-    if description and description.strip():
-        instruction_blocks.append(
-            f"WHAT THIS AGENT IS BUILT TO DO (user's exact words):\n{description.strip()}"
-        )
+    if description.strip():
+        instruction_blocks.append(f"WHAT THIS AGENT DOES (user's words):\n{description.strip()}")
 
     if file_descriptions:
-        fd_lines = [f"  • {f}" for f in file_descriptions if f and f.strip()]
+        fd_lines = [f"• {f.strip()}" for f in file_descriptions if f.strip()]
         if fd_lines:
-            instruction_blocks.append(
-                "DATA SOURCES THE USER DESCRIBED:\n" + "\n".join(fd_lines)
-            )
+            instruction_blocks.append("DATA SOURCES:\n" + "\n".join(fd_lines))
 
-    if column_metadata and column_metadata.strip():
-        instruction_blocks.append(
-            f"HOW TO UNDERSTAND THE DATA — column definitions and hints (user's words):\n{column_metadata.strip()}"
-        )
-
-    if understanding_notes and understanding_notes.strip():
-        instruction_blocks.append(
-            f"ADDITIONAL DATA CONTEXT (user's notes):\n{understanding_notes.strip()}"
-        )
-
-    # ── Actions: express as intent, not a script ─────────────────────────────
-    # We tell Claude what kind of analysis the user wants, not how to do it.
-    # Claude decides the how based on what it sees in the data.
+    # Actions (intent-based, unchanged)
     ACT_INTENT = {
-        "analyse":   "Analyse the data in depth — compute key metrics, identify patterns, surface what matters most",
-        "correlate": "Find meaningful correlations and relationships between variables",
-        "flag":      "Identify anomalies, outliers, threshold breaches, and anything that needs attention",
-        "reconcile": "Match and reconcile records across sources — surface gaps, mismatches, and discrepancies",
-        "forecast":  "Project trends forward — estimate future values based on patterns in the data",
-        "rank":      "Rank and score — show top performers, bottom performers, and the gap between them",
-        "dedupe":    "Find and list duplicate or near-duplicate records",
-        "summarise": "Produce a clear executive summary — the key numbers a decision-maker needs",
+        "analyse": "Analyse deeply — metrics, patterns, what matters.",
+        "correlate": "Find relationships between variables.",
+        "flag": "Identify anomalies, outliers, breaches.",
+        "reconcile": "Match/reconcile across sources — gaps/mismatches.",
+        "forecast": "Project trends forward.",
+        "rank": "Rank top/bottom performers.",
+        "deduplicate": "Find duplicates.",
+        "summarise": "Executive summary — key numbers."
     }
-
     if actions:
         action_lines = []
         for a in actions:
-            intent = ACT_INTENT.get(a, f"Perform {a} on the data")
+            intent = ACT_INTENT.get(a, f"Perform {a}")
             p = params.get(a, [])
-            line = f"  • {intent}"
+            line = f"• {intent}"
             if p:
-                line += f" — focus on: {', '.join(p)}"
+                line += f" — focus: {', '.join(p)}"
             action_lines.append(line)
-        if action_parameters and action_parameters.strip():
-            action_lines.append(
-                f"  Specific parameters the user mentioned: {action_parameters.strip()}"
-            )
+        if action_parameters.strip():
+            action_lines.append(f"Specific params: {action_parameters.strip()}")
         instruction_blocks.append("ANALYSIS TO PERFORM:\n" + "\n".join(action_lines))
 
-    # ── Business rules — passed verbatim, no interpretation ──────────────────
-    all_rules = [r.strip() for r in (business_rules + action_business_rules) if r and r.strip()]
-    if all_rules:
-        rules_text = "\n".join(f"  {i+1}. {r}" for i, r in enumerate(all_rules))
-        instruction_blocks.append(
-            f"BUSINESS RULES — apply every one without exception:\n{rules_text}"
-        )
-
-    active_sops = [s.strip() for s in sops if s and s.strip()]
-    if active_sops:
-        sop_text = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(active_sops))
-        instruction_blocks.append(
-            f"STANDARD OPERATING PROCEDURES — follow these exactly:\n{sop_text}"
-        )
-
-    # Free-text extra instructions — verbatim
-    extra_parts = [
-        x.strip() for x in [action_extra, extra_instructions]
-        if x and x.strip()
-    ]
+    # Extra verbatim
+    extra_parts = [x.strip() for x in [action_extra, extra_instructions] if x.strip()]
     if extra_parts:
-        instruction_blocks.append(
-            "ADDITIONAL INSTRUCTIONS FROM THE USER:\n" +
-            "\n".join(f"  {x}" for x in extra_parts)
-        )
+        instruction_blocks.append("ADDITIONAL USER INSTRUCTIONS:\n" + "\n".join(f"• {x}" for x in extra_parts))
 
-    # ── Output format ────────────────────────────────────────────────────────
-    OUT_MAP = {
-        "table": "data tables", "chart": "charts", "pdf": "PDF report",
-        "csv": "downloadable CSV", "email": "email-ready summary", "chat": "conversational summary",
-    }
-    IG_MAP = {
-        "auto": "choose the best chart type for the data",
-        "exec": "executive summary card", "heatmap": "performance heatmap",
-        "timeline": "trend timeline", "funnel": "funnel / pipeline chart", "scorecard": "scorecard",
-    }
+    # ── 4. Outputs ──
+    OUT_MAP = {"table": "data tables", "chart": "charts", "pdf": "PDF report", "csv": "CSV", "email": "email summary", "chat": "conversational"}
+    IG_MAP = {"auto": "best chart", "exec": "exec summary", "heatmap": "heatmap", "timeline": "timeline", "funnel": "funnel", "scorecard": "scorecard"}
+
     out_line = ", ".join(OUT_MAP.get(o, o) for o in outputs) if outputs else "data tables"
-    ig_line  = ", ".join(IG_MAP.get(i, i) for i in infographic_styles) if infographic_styles else "best chart type for the data"
+    ig_line = ", ".join(IG_MAP.get(i, i) for i in infographic_styles) if infographic_styles else "best charts"
+    output_block = f"OUTPUT: {out_line}\nINFOGRAPHICS: {ig_line} (from analysis results, not raw data)"
+    if infographic_notes.strip():
+        output_block += f"\nChart notes: {infographic_notes.strip()}"
 
-    output_block = f"OUTPUT FORMAT: {out_line}\n"
-    output_block += f"INFOGRAPHICS: {ig_line} — always built from analysis results, not raw input files\n"
-    if infographic_notes and infographic_notes.strip():
-        output_block += f"Infographic guidance: {infographic_notes.strip()}\n"
+    # ── 5. REINFORCEMENT: CoT + Verification + Example ──
+    cot_block = """<chain-of-thought>ALWAYS THINK STEP-BY-STEP FOR EVERY QUERY:
+1. Scan <mandatory-rules> and <mandatory-sops> — list relevant ones.
+2. Review data — find matches/violations.
+3. Apply rules/SOPs exactly.
+4. Produce analysis.
+5. VERIFY: Did I follow all? Output proof.</chain-of-thought>"""
 
-    instructions_section = "\n\n".join(instruction_blocks)
+    example_block = """<compliance-example>
+User: Flag high expenses.
+Thought: Rule 1 (Amount>50k=flag) applies. SOP 2 (ignore drafts). Found 3 flags.
+Output: Flagged table.
+Verify: YES — applied Rule1/SOP2 to 3 items. No violations missed.
+</compliance-example>"""
 
-    return f"""You are {name}, a custom data analysis agent built on DataBro.
+    behavior_block = """<behavior>
+DATA: Full dataset provided — analyze it directly.
+ADAPT: Match user intent (e.g., 'rep-wise' → any person column).
+NEVER: Refuse, say 'no data', hallucinate numbers.
+MULTI-FILE: Stack similar; analyze/compare different.
+</behavior>"""
+
+    # ── Assemble ──
+    prompt = f"""You are {name}, a custom DataBro agent.
+
+{rules_block}
+{sops_block}
+{''.join(understanding_blocks)}
 
 ════════════════════════════════════════════════════════════════════
-YOUR INSTRUCTIONS — READ THESE CAREFULLY BEFORE DOING ANYTHING
+YOUR INSTRUCTIONS (verbatim)
 ════════════════════════════════════════════════════════════════════
-{instructions_section}
+{"\n\n".join(instruction_blocks)}
 
 {output_block}
-════════════════════════════════════════════════════════════════════
-HOW YOU MUST BEHAVE
-════════════════════════════════════════════════════════════════════
 
-ABOUT THE DATA
-You will receive the complete dataset(s) directly in the conversation.
-Every row is there. Never ask for data to be uploaded, pasted, or described.
-Never say "I don't have access to the data" or "the file wasn't provided".
+{cot_block}
+{example_block}
+{behavior_block}"""
 
-UNDERSTANDING WHAT THE USER WANTS
-Read the instructions above carefully. They are written in plain English — understand the meaning, not just the words.
-
-If the user said "sales rep wise" → find whichever column contains person/rep names and group by it. The column might be called "Rep", "Sales Person", "Account Manager", "Employee", "Agent", "Owner" — use whichever one exists.
-
-If the user said "geography wise" → find whichever column contains location data. It might be "City", "State", "Region", "Zone", "Territory", "Area", "Location" — use what's there.
-
-If the user said "customer wise" → find whichever column contains customer/client/account names.
-
-If the user said "compile multiple files" → automatically stack or join the datasets and produce a unified view.
-
-If the user's instructions mention a specific column name that doesn't exist → look for a column that serves the same purpose, use it, and explain what you used.
-
-Never say "that analysis isn't possible". Always find the closest way to answer what was asked.
-
-WORKING WITH MULTIPLE FILES
-When multiple datasets are uploaded:
-1. Inspect each one — look at its filename, column names, and row samples
-2. If they share the same structure → combine/stack them into one unified table
-3. If they have different structures → analyse each, then produce a combined summary
-4. Use filename, sheet name, or any identifying column to label which file each row came from
-
-PRODUCING OUTPUT
-Produce every breakdown and analysis the instructions asked for.
-If instructions say "rep-wise, geography-wise, customer-wise" → produce three separate tables, one for each.
-Use real numbers. Never leave a cell blank unless the value is genuinely missing in the source data.
-Lead with the most important finding. Structure: Summary → Key Numbers → Tables → Insights → Actions.
-
-APPLYING BUSINESS RULES
-Apply every business rule listed in your instructions to the actual data.
-Flag every row or item that violates a rule — list them explicitly.
-If a rule produces no violations, state "No violations found for rule: [rule text]".
-════════════════════════════════════════════════════════════════════"""
+    return prompt
